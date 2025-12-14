@@ -3,7 +3,18 @@
 mdx-m3-viewer
 =============
 
+[中文版本](README_CN.md)
+
 At the core of it, a 3D model viewer for MDX and M3 models used by the games Warcraft 3 and Starcraft 2 respectively.
+
+## Recent Updates
+
+This project has been updated with the following improvements:
+
+1. **Build and Lint System Upgrade**: The project build and lint processes have been upgraded to the latest Vite architecture
+2. **React Version Update**: Upgraded to the latest React ecosystem version
+
+Project source: [https://github.com/flowtsohg/mdx-m3-viewer/tree/master](https://github.com/flowtsohg/mdx-m3-viewer/tree/master)
 
 The viewer part handles the following formats:
 * MDX (Warcraft 3 model): extensive support, almost everything should work.
@@ -31,7 +42,7 @@ There are all sorts of utilities that were made over the years.\
 These include things like...
 * The library's unit tester, which compares rendered results against stored images that were generated in the same way.
 * The MDX sanity test, which looks for errors and weird things in MDX models.
-* A Jass context that can...well, run Jass code. That being said, it really runs Lua code converted from Jass, on a JS Lua VM. What a tongue twiser. While it supports some Warcraft 3 natives, don't expect it run whole maps. Maybe in the future 😉
+* A Jass context that can...well, run Jass code. That being said, it really runs Lua code converted from Jass, on a JS Lua VM. What a tongue twister. While it supports some Warcraft 3 natives, don't expect it run whole maps. Maybe in the future 😉
 * A utility that makes it possible to open Warcraft 3 maps in the vanilla World Editor, in cases were said maps used a non-vanilla editor with extended GUI, in which case they crash upon opening in the official editor.
 * etc.
 
@@ -534,4 +545,3 @@ To support a variable FPS while keeping the same animation speed, `dt` can be co
 
   viewer.updateAndRender(dt);
 }());
-```

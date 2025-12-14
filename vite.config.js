@@ -8,9 +8,6 @@ const clientDirs = readdirSync('./clients', { withFileTypes: true })
   .filter(dirent => dirent.isDirectory())
   .map(dirent => dirent.name);
 
-// 添加editor目录
-clientDirs.push('editor');
-
 // 为每个客户端创建入口点
 const clientInputs = {};
 clientDirs.forEach(dir => {
