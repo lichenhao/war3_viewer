@@ -1,8 +1,8 @@
-import { LUA_REGISTRYINDEX } from 'fengari/src/defs';
-import { lua_State } from 'fengari/src/lstate';
-import { lua_register, lua_pushinteger, lua_pushnumber, lua_pushstring, lua_pushlightuserdata, lua_touserdata, lua_pushboolean, lua_pushnil, lua_toboolean } from 'fengari/src/lapi';
-import { luaL_checkstring, luaL_checkinteger, luaL_checknumber, luaL_ref, luaL_unref } from 'fengari/src/lauxlib';
-import { lua_yield } from 'fengari/src/ldo';
+import { LUA_REGISTRYINDEX } from './fengari-web-adapter.js';
+import { type lua_State } from './fengari-web-adapter.js';
+import { lua_register, lua_pushinteger, lua_pushnumber, lua_pushstring, lua_pushlightuserdata, lua_touserdata, lua_pushboolean, lua_pushnil, lua_toboolean } from './fengari-web-adapter.js';
+import { luaL_checkstring, luaL_checkinteger, luaL_checknumber, luaL_ref, luaL_unref } from './fengari-web-adapter.js';
+import { lua_yield } from './fengari-web-adapter.js';
 import { JassTimer, JassGroup, JassLocation, JassForce, JassUnit, JassTrigger, JassPlayer, JassPlayerColor, JassMapControl, JassHandle } from './types/index.js';
 import Context from './context.js';
 

@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 
 <head>
-    <title></title>
+    <title>Downgrader</title>
     <meta charset="utf-8" />
 </head>
 
@@ -15,9 +15,19 @@
     <div>
         Triggers of Reforged maps (1.32) will be deleted, because my code doesn't (yet?) support Reforged triggers.
     </div>
-
+    
+    <!-- 引入独立打包的第三方库 -->
+    <script src="/vendors/events.vendor.min.js"></script>
+    <script src="/vendors/fengari.vendor.min.js"></script>
+    <script src="/vendors/fengari-web.vendor.min.js"></script>
+    <script src="/vendors/gl-matrix.vendor.min.js"></script>
+    <script src="/vendors/pako.vendor.min.js"></script>
+    <script src="/vendors/tga-js.vendor.min.js"></script>
+    <!-- 注册机制 -->
+    <script src="/vendors/register.umd.cjs"></script>
+    
     <script src="../thirdparty/filesaver.js"></script>
-    <script type="module" src="/clients/downgrader/index.js"></script>
+    <script type="module" src="/clients/downgrader.min.js"></script>
 </body>
 
 </html>

@@ -7,8 +7,17 @@
 </head>
 
 <body>
+    <!-- 引入独立打包的第三方库 -->
+    <script src="/vendors/events.vendor.min.js"></script>
+    <script src="/vendors/fengari-web.vendor.min.js"></script>
+    <script src="/vendors/gl-matrix.vendor.min.js"></script>
+    <script src="/vendors/pako.vendor.min.js"></script>
+    <script src="/vendors/tga-js.vendor.min.js"></script>
+    <!-- 注册机制 -->
+    <script src="/vendors/register.umd.cjs"></script>
+    
     <script src="../thirdparty/filesaver.js"></script>
-    <script type="module" src="/clients/mdlxoptimizer/index.ts"></script>
+    <script type="module" src="/clients/mdlxoptimizer.min.js"></script>
 </body>
 
 </html>

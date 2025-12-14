@@ -1,4 +1,4 @@
-import { lua_newthread, lua_State } from 'fengari/src/lstate';
+import { lua_newthread, type lua_State } from './fengari-web-adapter.js';
 import JassTrigger from './types/trigger.js';
 import JassTimer from './types/timer.js';
 import JassUnit from './types/unit.js';

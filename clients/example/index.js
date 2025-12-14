@@ -2,16 +2,16 @@ import * as ModelViewer from '../../src/';
 import { setupCamera } from '../shared/camera';
 const handlers = ModelViewer.viewer.handlers;
 
-let canvas = document.getElementById('canvas');
+const canvas = document.getElementById('canvas');
 
 canvas.width = 800;
 canvas.height = 600;
 
 // Create the viewer!
-let viewer = new ModelViewer.viewer.ModelViewer(canvas);
+const viewer = new ModelViewer.viewer.ModelViewer(canvas);
 
 // Create a new scene. Each scene has its own camera, and a list of things to render.
-let scene = viewer.addScene();
+const scene = viewer.addScene();
 
 // Check camera.js!
 setupCamera(scene);
@@ -39,17 +39,18 @@ viewer.addHandler(handlers.blp);
 // Given a possibly relative source, it should return the actual source to load from.
 // This can be in the form of an URL string, or direct sources from memory (e.g. a previously loaded ArrayBuffer).
 function pathSolver(src) {
-  return 'resources/' + src;
+  // 在 Vite 开发服务器中，需要使用相对于服务器根目录的路径
+  return '/clients/example/resources/' + src;
 }
 
 // Load our MDX model!
-let modelPromise = viewer.load('SmileyGW_004.mdx', pathSolver);
+const modelPromise = viewer.load('SmileyGW_004.mdx', pathSolver);
 
 modelPromise.then((model) => {
   // The promise can return undefined if something went wrong!
   if (model) {
     // Create an instance of this model.
-    let instance = model.addInstance();
+    const instance = model.addInstance();
 
     // Set the instance's scene.
     // Equivalent to scene.addInstance(instance)
@@ -64,7 +65,7 @@ modelPromise.then((model) => {
     instance.setSequenceLoopMode(2);
 
     // Let's create another instance and do other stuff with it.
-    let instance2 = model.addInstance();
+    const instance2 = model.addInstance();
     instance2.setScene(scene);
     instance2.setSequence(0);
     instance2.setSequenceLoopMode(2);
@@ -72,7 +73,7 @@ modelPromise.then((model) => {
     instance2.uniformScale(0.5);
 
     // And a third one.
-    let instance3 = model.addInstance();
+    const instance3 = model.addInstance();
     instance3.setScene(scene);
     instance3.setSequence(2);
     instance3.setSequenceLoopMode(2);

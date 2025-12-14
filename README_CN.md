@@ -62,10 +62,14 @@ pnpm install
 
 ### 构建项目
 ```bash
-# 构建所有客户端
+# 构建所有产物（UMD 和 MJS）
 pnpm build
 
-# 构建UMD版本（用于发布）
+# 分别构建
+pnpm build:umd
+pnpm build:mjs
+
+# 构建用于发布的版本
 pnpm prepublishOnly
 ```
 

@@ -1,10 +1,10 @@
 
 import { EventEmitter } from 'events';
-import { lua_State } from 'fengari/src/lstate';
-import { lua_atnativeerror, lua_getglobal, lua_pcall, lua_pop, lua_pushstring, lua_rawgeti, lua_touserdata } from 'fengari/src/lapi';
-import { LUA_REGISTRYINDEX, thread_status, to_jsstring, to_luastring } from 'fengari/src/defs';
-import { luaL_checknumber, luaL_loadstring, luaL_newstate, luaL_tolstring } from 'fengari/src/lauxlib';
-import { lua_resume } from 'fengari/src/ldo';
+import { lua_State } from './fengari-web-adapter.js';
+import { lua_atnativeerror, lua_getglobal, lua_pcall, lua_pop, lua_pushstring, lua_rawgeti, lua_touserdata } from './fengari-web-adapter.js';
+import { LUA_REGISTRYINDEX, thread_status, to_jsstring, to_luastring } from './fengari-web-adapter.js';
+import { luaL_checknumber, luaL_loadstring, luaL_newstate, luaL_tolstring } from './fengari-web-adapter.js';
+import { lua_resume } from './fengari-web-adapter.js';
 import War3Map from '../../parsers/w3x/map.js';
 import jass2lua from './jass2lua.js';
 import bindNatives from './natives.js';

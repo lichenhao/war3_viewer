@@ -64,7 +64,7 @@ These include things like...
 npm install mdx-m3-viewer
 npm run build
 ```
-This will generate the CommonJS, UMD, and the packed clients under `dist`.
+This will generate the UMD and MJS builds under `dist/umd` and `dist/mjs` respectively.
 
 ------------------------
 
