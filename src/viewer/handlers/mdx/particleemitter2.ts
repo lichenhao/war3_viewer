@@ -1,0 +1,56 @@
+import ParticleEmitter2Object from './particleemitter2object.js';
+import MdxModelInstance from './modelinstance.js';
+import MdxNode from './node.js';
+import MdxEmitter from './emitter.js';
+import Particle2 from './particle2.js';
+
+const emissionRateHeap = new Float32Array(1);
+
+/**
+ * An MDX particle emitter type 2.
+ */
+export default class ParticleEmitter2 extends MdxEmitter {
+  node: MdxNode;
+  lastEmissionKey = -1;
+
+  constructor(instance: MdxModelInstance, emitterObject: ParticleEmitter2Object) {
+    super(instance, emitterObject);
+
+    this.node = instance.nodes[emitterObject.index];
+  }
+
+  updateEmission(dt: number): void {
+    const instance = <MdxModelInstance>this.instance;
+
+    if (instance.allowParticleSpawn) {
+      const emitterObject = <ParticleEmitter2Object>this.emitterObject;
+      const keyframe = emitterObject.getEmissionRate(emissionRateHeap, instance.sequence, instance.frame, instance.counter);
+
+      if (emitterObject.squirt) {
+        if (keyframe !== this.lastEmissionKey) {
+          this.currentEmission += emissionRateHeap[0];
+        }
+
+        this.lastEmissionKey = keyframe;
+      } else {
+        this.currentEmission += emissionRateHeap[0] * dt;
+      }
+    }
+  }
+
+  emit(): void {
+    const emitterObject = <ParticleEmitter2Object>this.emitterObject;
+
+    if (emitterObject.head) {
+      this.emitObject(0);
+    }
+
+    if (emitterObject.tail) {
+      this.emitObject(1);
+    }
+  }
+
+  createObject(): Particle2 {
+    return new Particle2(this);
+  }
+}

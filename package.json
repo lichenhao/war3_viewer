@@ -1,0 +1,48 @@
+{
+  "name": "mdx-m3-viewer",
+  "version": "5.13.0",
+  "description": "A browser WebGL model viewer. Mainly focused on models of the games Warcraft 3 and Starcraft 2.",
+  "main": "dist/umd/viewer.js",
+  "types": "dist/cjs/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "serve": "vite preview",
+    "prepublishOnly": "node clean.cjs && vite build --mode=umd",
+    "build-map": "node editor/simple-build.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/flowtsohg/mdx-m3-viewer.git"
+  },
+  "author": "Chananya Freiman",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/flowtsohg/mdx-m3-viewer/issues"
+  },
+  "homepage": "https://github.com/flowtsohg/mdx-m3-viewer#readme",
+  "dependencies": {
+    "events": "^3.3.0",
+    "fengari": "^0.1.4",
+    "gl-matrix": "3.3.0",
+    "mdx-m3-viewer": "link:",
+    "pako": "^2.0.3",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "tga-js": "^1.1.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@types/node": "^25.0.2",
+    "@types/pako": "^1.0.2",
+    "@typescript-eslint/eslint-plugin": "^8.49.0",
+    "@typescript-eslint/parser": "^8.49.0",
+    "@vitejs/plugin-react": "^5.1.2",
+    "eslint": "^9.39.2",
+    "eslint-plugin-react": "^7.37.5",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.49.0",
+    "vite": "^7.2.7"
+  }
+}

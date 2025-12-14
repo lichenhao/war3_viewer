@@ -1,0 +1,122 @@
+import Trigger from '../../../parsers/w3x/wtg/trigger.js';
+import ECA from '../../../parsers/w3x/wtg/eca.js';
+import Parameter from '../../../parsers/w3x/wtg/parameter.js';
+import SubParameters from '../../../parsers/w3x/wtg/subparameters.js';
+import CustomTextTrigger from '../../../parsers/w3x/wct/customtexttrigger.js';
+import { TriggerData } from '../../../parsers/w3x/wtg/triggerdata.js';
+import War3MapWts from '../../../parsers/w3x/wts/file.js';
+
+export interface WEUChange {
+  type: string;
+  reason: string;
+  data: string;
+  stack: string;
+}
+
+export default class WeuData {
+  triggerData: TriggerData;
+  stringTable: War3MapWts;
+  preplacedObjects: Map<string, boolean> = new Map();
+  changes: WEUChange[] = [];
+  stack: (Trigger | ECA | Parameter | SubParameters)[] = [];
+
+  constructor(triggerData: TriggerData, stringTable: War3MapWts) {
+    this.triggerData = triggerData;
+    this.stringTable = stringTable;
+  }
+
+  push(object: Trigger | ECA | Parameter | SubParameters): void {
+    this.stack.unshift(object);
+  }
+
+  pop(): void {
+    this.stack.shift();
+  }
+
+  change(type: string, reason: string, data: string): void {
+    this.changes.push({ type, reason, data, stack: this.stackToString() });
+  }
+
+  stackToString(): string {
+    return this.stack.map((object) => {
+      if (object instanceof Parameter) {
+        return object.value;
+      } else {
+        return object.name;
+      }
+    }).reverse().join(' > ');
+  }
+
+  getTriggerName(): string {
+    for (const node of this.stack) {
+      if (node instanceof Trigger) {
+        return node.name;
+      }
+    }
+
+    return '';
+  }
+
+  /**
+   * Every time a reference to a preplaced object is encountered while testing the GUI, this will be called with isGUI being true.
+   * Every time a reference to a preplaced object is converted to custom script, this will be called with isGUI being false.
+   * This is used to track references that existed in GUI before the conversion, but that will be only in custom scripts afterwards.
+   * References that are lost due to the conversion are then added in a new trigger called PreplacedObjectReferences.
+   */
+  updateGUIReference(name: string, isGUI: boolean): void {
+    // For now track only units and destructibles.
+    // Not sure what else needs tracking.
+    if (name.startsWith('gg_unit') || name.startsWith('gg_dest')) {
+      const preplacedObjects = this.preplacedObjects;
+
+      // If the reference is already known to be used by GUI, no need to do anything.
+      if (!preplacedObjects.get(name)) {
+        preplacedObjects.set(name, isGUI);
+      }
+    }
+  }
+
+  saveGUIReferences(triggers: Trigger[], customTextTriggers: CustomTextTrigger[]): void {
+    const references = [];
+
+    // Get all of the references that are no longer references.
+    for (const [name, isGUI] of this.preplacedObjects) {
+      if (!isGUI) {
+        references.push(name);
+      }
+    }
+
+    // If there are indeed missing references, add them to a new trigger.
+    if (references.length) {
+      const trigger = new Trigger();
+      trigger.name = 'PreplacedObjectReferences';
+      trigger.isEnabled = 1;
+      trigger.isInitiallyOff = 1;
+
+      for (const reference of references) {
+        const eca = new ECA();
+        eca.type = 2;
+        eca.isEnabled = 1;
+
+        if (reference.startsWith('gg_unit')) {
+          eca.name = 'RemoveUnit';
+        } else if (reference.startsWith('gg_dest')) {
+          eca.name = 'RemoveDestructable';
+        }
+
+        const parameter = new Parameter();
+        parameter.type = 1;
+        parameter.value = reference;
+
+        eca.parameters[0] = parameter;
+
+        trigger.ecas.push(eca);
+      }
+
+      triggers.push(trigger);
+      customTextTriggers.push(new CustomTextTrigger());
+
+      this.change('references', 'Saved references to preplaced objects lost due to conversions', references.join('\n'));
+    }
+  }
+}

@@ -1,0 +1,82 @@
+import RibbonEmitter from '../../../parsers/mdlx/ribbonemitter.js';
+import MdxModel from './model.js';
+import GenericObject from './genericobject.js';
+import Layer from './layer.js';
+import { EMITTER_RIBBON, SETTING_PARTICLES_HIGH } from './geometryemitterfuncs.js';
+
+/**
+ * An MDX ribbon emitter.
+ */
+export default class RibbonEmitterObject extends GenericObject {
+  geometryEmitterType = EMITTER_RIBBON;
+  layer: Layer;
+  heightAbove: number;
+  heightBelow: number;
+  alpha: number;
+  color: Float32Array;
+  lifeSpan: number;
+  textureSlot: number;
+  emissionRate: number;
+  gravity: number;
+  columns: number;
+  rows: number;
+  /**
+   * Even if the internal texture isn't loaded, it's fine to run emitters based on this emitter object.
+   * 
+   * The ribbons will simply be black.
+   */
+  ok = true;
+
+  constructor(model: MdxModel, emitter: RibbonEmitter, index: number) {
+    super(model, emitter, index);
+
+    this.layer = model.materials[emitter.materialId].layers[0];
+    this.heightAbove = emitter.heightAbove;
+    this.heightBelow = emitter.heightBelow;
+    this.alpha = emitter.alpha;
+    this.color = emitter.color;
+    this.lifeSpan = emitter.lifeSpan;
+    this.textureSlot = emitter.textureSlot;
+    this.emissionRate = emitter.emissionRate * SETTING_PARTICLES_HIGH;
+    this.gravity = emitter.gravity;
+    this.columns = emitter.columns;
+    this.rows = emitter.rows;
+  }
+
+  getHeightBelow(out: Float32Array, sequence: number, frame: number, counter: number): number {
+    return this.getScalarValue(out, 'KRHB', sequence, frame, counter, this.heightBelow);
+  }
+
+  getHeightAbove(out: Float32Array, sequence: number, frame: number, counter: number): number {
+    return this.getScalarValue(out, 'KRHA', sequence, frame, counter, this.heightAbove);
+  }
+
+  getTextureSlot(out: Uint32Array, sequence: number, frame: number, counter: number): number {
+    return this.getScalarValue(out, 'KRTX', sequence, frame, counter, 0);
+  }
+
+  getColor(out: Float32Array, sequence: number, frame: number, counter: number): number {
+    return this.getVectorValue(out, 'KRCO', sequence, frame, counter, this.color);
+  }
+
+  getAlpha(out: Float32Array, sequence: number, frame: number, counter: number): number {
+    return this.getScalarValue(out, 'KRAL', sequence, frame, counter, this.alpha);
+  }
+
+  /**
+   * Ribbon emitters specifically have an alpha.
+   * 
+   * When this alpha is 0, naturally ribbons shouldn't be emitted.
+   * 
+   * Therefore first check the alpha animation, and only if it's >0 check the visibility animation.
+   */
+  override getVisibility(out: Float32Array, sequence: number, frame: number, counter: number): number {
+    const keyframe = this.getAlpha(out, sequence,frame,counter);
+    
+    if (out[0] === 0) {
+      return keyframe;
+    }
+
+    return this.getScalarValue(out, 'KRVS', sequence, frame, counter, 1);
+  }
+}

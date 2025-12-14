@@ -1,0 +1,56 @@
+import M3ParserStc from '../../../parsers/m3/stc.js';
+import { AnimationReference } from '../../../parsers/m3/animationreference.js';
+import M3ModelInstance from './modelinstance.js';
+import M3SdContainer from './sd.js';
+import M3ParserSd from '../../../parsers/m3/sd.js';
+import { quat, vec3 } from 'gl-matrix';
+
+/**
+ * M3 sequence data.
+ */
+export default class M3Stc {
+  name: string;
+  runsConcurrent: number;
+  priority: number;
+  stsIndex: number;
+  animRefs: number[][] = [];
+  sd: M3SdContainer[] = [];
+
+  constructor(stc: M3ParserStc) {
+    const animIds = <Uint32Array>stc.animIds.get();
+
+    this.name = <string>stc.name.get();
+    this.runsConcurrent = stc.runsConcurrent;
+    this.priority = stc.priority;
+    this.stsIndex = stc.stsIndex;
+
+    const uints = <Uint32Array>stc.animRefs.get();
+    const animRefs = new Uint16Array(uints.buffer);
+
+    // Allows direct checks instead of loops
+    for (let i = 0, l = animIds.length; i < l; i++) {
+      this.animRefs[animIds[i]] = [animRefs[i * 2 + 1], animRefs[i * 2]];
+    }
+
+    for (const sd of stc.sd) {
+      const container = new M3SdContainer();
+
+      const sds = sd.get();
+      if (sds) {
+        container.addSds(<M3ParserSd[]>sds);
+      }
+
+      this.sd.push(container);
+    }
+  }
+
+  getValueUnsafe(animRef: AnimationReference, instance: M3ModelInstance): number | vec3 | quat | Uint8Array | null {
+    const ref = this.animRefs[animRef.animId];
+
+    if (ref) {
+      return this.sd[ref[0]].getValueUnsafe(ref[1], animRef, instance.frame, this.runsConcurrent);
+    }
+
+    return animRef.initValue;
+  }
+}

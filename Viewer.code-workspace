@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"editor.tabSize": 2,
+		"files.eol": "\n",
+		"typescript.preferences.quoteStyle": "single",
+		"typescript.validate.enable": true,
+		"editor.formatOnSave": true,
+		"eslint.lintTask.enable": true,
+		"eslint.validate": [
+			"typescript"
+		],
+		"workbench.editor.enablePreview": false,
+		"typescript.tsdk": "node_modules\\typescript\\lib"
+	}
+}

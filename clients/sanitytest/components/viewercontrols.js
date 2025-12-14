@@ -1,0 +1,156 @@
+import { DebugRenderMode } from '../../../src/viewer/viewer';
+import Component from "../../shared/component";
+import Toggle from "../../shared/components/toggle";
+import { clearSelect, createElement } from "../../shared/domutils";
+import { TEAM_COLORS } from "./teamcolors";
+
+export default class ViewerControls extends Component {
+  constructor(viewer, options) {
+    super({ ...options, className: 'viewer-controls' });
+
+    this.viewer = viewer;
+
+    // Team colors.
+    let container = createElement({ container: this.container });
+
+    createElement({ textContent: 'Team color:', container });
+
+    this.teamColorElement = createElement({ tagName: 'div', className: 'controls teamcolor', style: 'background-color:red', container });
+
+    this.teamColorsElement = createElement({
+      tagName: 'select', className: 'controls', onchange: () => {
+        this.viewer.setTeamColor(this.teamColorsElement.selectedIndex);
+
+        this.teamColorElement.style.backgroundColor = TEAM_COLORS[this.teamColorsElement.selectedIndex].color;
+      }, container
+    });
+
+    for (let teamColor of TEAM_COLORS) {
+      this.teamColorsElement.add(createElement({ tagName: 'option', textContent: teamColor.name }));
+    }
+
+    // Extents.
+    container = createElement({ container: this.container });
+
+    createElement({ textContent: 'Show extents:', container });
+    this.extentElement = createElement({
+      tagName: 'select', className: 'controls', onchange: () => this.viewer.updateExtents(), container
+    });
+
+    this.extentElement.add(createElement({ tagName: 'option', textContent: 'No' }));
+    this.extentElement.add(createElement({ tagName: 'option', textContent: 'Box' }));
+    this.extentElement.add(createElement({ tagName: 'option', textContent: 'Sphere' }));
+    this.extentElement.add(createElement({ tagName: 'option', textContent: 'Both' }));
+    this.extentElement.selectedIndex = 0;
+
+    // Collision shapes.
+    container = createElement({ container: this.container });
+
+    createElement({ textContent: 'Show collisions:', container });
+    this.collisionsToggle = new Toggle('No', 'Yes', (e) => {
+      this.viewer.showCollisions(e.clicked);
+    }, { className: 'controls', container });
+
+    // Run animations.
+    container = createElement({ container: this.container });
+
+    createElement({ textContent: 'Run Animations:', container });
+    this.animationToggle = new Toggle('Yes', 'No', (e) => {
+      if (e.clicked) {
+        this.viewer.viewer.frameTime = 0;
+      } else {
+        this.viewer.viewer.frameTime = 1000 / 60;
+      }
+    }, { className: 'controls', container });
+
+    // Cycle animations.
+    container = createElement({ container: this.container });
+
+    createElement({ textContent: 'Cycle Animations:', container });
+    this.cycleToggle = new Toggle('Yes', 'No', null, { className: 'controls', container });
+
+    // Select animations.
+    container = createElement({ container: this.container });
+
+    createElement({ textContent: 'Animations:', container });
+    this.sequencesElement = createElement({
+      tagName: 'select', className: 'controls', onchange: () => {
+        if (!this.cycleToggle.clicked) {
+          this.cycleToggle.toggle();
+        }
+
+        this.viewer.viewer.clearEmittedObjects();
+
+        this.viewer.setSequence(this.sequencesElement.selectedIndex - 1);
+      }, container
+    });
+
+    // Frame.
+    container = createElement({ container: this.container });
+
+    createElement({ textContent: 'Frame:', container });
+    this.frameElement = createElement({ container });
+
+    // Camera.
+    container = createElement({ container: this.container });
+
+    createElement({ textContent: 'Camera:', container });
+    this.camerasElement = createElement({ tagName: 'select', className: 'controls', onchange: () => this.viewer.setCamera(this.camerasElement.selectedIndex - 1), container });
+
+    // Debug modes.
+    container = createElement({ container: this.container });
+
+    createElement({ textContent: 'Debug Mode:', container });
+    this.debugRenderSelect = createElement({
+      tagName: 'select', className: 'controls', onchange: () => {
+        // Somewhat hacky way to treat an enum.
+        this.viewer.viewer.debugRenderMode = this.debugRenderSelect.selectedIndex;
+      }, container
+    });
+    this.debugRenderSelect.add(createElement({ tagName: 'option', textContent: 'None' }));
+    this.debugRenderSelect.add(createElement({ tagName: 'option', textContent: 'Diffuse' }));
+    this.debugRenderSelect.add(createElement({ tagName: 'option', textContent: 'Normal map' }));
+    this.debugRenderSelect.add(createElement({ tagName: 'option', textContent: 'Occlusion' }));
+    this.debugRenderSelect.add(createElement({ tagName: 'option', textContent: 'Roughness' }));
+    this.debugRenderSelect.add(createElement({ tagName: 'option', textContent: 'Metallic' }));
+    this.debugRenderSelect.add(createElement({ tagName: 'option', textContent: 'TC Factor' }));
+    this.debugRenderSelect.add(createElement({ tagName: 'option', textContent: 'Emissive' }));
+    this.debugRenderSelect.add(createElement({ tagName: 'option', textContent: 'TexCoords' }));
+    this.debugRenderSelect.add(createElement({ tagName: 'option', textContent: 'Normals' }));
+    this.debugRenderSelect.add(createElement({ tagName: 'option', textContent: 'Tangents' }));
+  }
+
+  frame(frame) {
+    this.frameElement.textContent = `${Math.floor(frame)}`;
+  }
+
+  updateInstance(instance) {
+    clearSelect(this.sequencesElement);
+
+    this.sequencesElement.add(createElement({ tagName: 'option', textContent: 'None' }));
+
+    for (let sequence of instance.model.sequences) {
+      this.sequencesElement.add(createElement({ tagName: 'option', textContent: sequence.name }));
+    }
+
+    clearSelect(this.camerasElement);
+
+    this.camerasElement.add(createElement({ tagName: 'option', textContent: 'None' }));
+
+    for (let camera of instance.model.cameras) {
+      this.camerasElement.add(createElement({ tagName: 'option', textContent: camera.name }));
+    }
+  }
+
+  setSequence(sequence) {
+    if (this.sequencesElement.options.length === 1) {
+      sequence = -1;
+    }
+
+    this.sequencesElement.selectedIndex = sequence + 1;
+  }
+
+  setCamera(camera) {
+    this.camerasElement.selectedIndex = camera + 1;
+  }
+}

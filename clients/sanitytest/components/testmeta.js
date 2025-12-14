@@ -1,0 +1,44 @@
+import Component from "../../shared/component";
+import { createElement } from "../../shared/domutils";
+
+function singleOrPlural(name, count) {
+  if (count === 1) {
+    return name;
+  }
+
+  return `${name}s`;
+}
+
+export default class TestMeta extends Component {
+  constructor(name, parsingError, results, options) {
+    super({ ...options, className: 'clickable highlightable padded' });
+
+    this.name = createElement({ className: 'bold', textContent: name, container: this.container });
+
+    let container = createElement({ className: 'indent', container: this.container });
+
+    if (parsingError) {
+      createElement({ className: 'error', textContent: 'Parsing failed', container });
+    }
+
+    if (results.errors || results.severe || results.warnings || results.unused) {
+      if (results.errors) {
+        createElement({ className: 'error', textContent: `${results.errors} ${singleOrPlural('error', results.errors)}`, container });
+      }
+
+      if (results.severe) {
+        createElement({ className: 'severe', textContent: `${results.severe} ${singleOrPlural('severe warning', results.severe)}`, container });
+      }
+
+      if (results.warnings) {
+        createElement({ className: 'warning', textContent: `${results.warnings} ${singleOrPlural('warning', results.warnings)}`, container });
+      }
+
+      if (results.unused) {
+        createElement({ className: 'unused', textContent: `${results.unused} unused`, container });
+      }
+    } else {
+      createElement({ className: 'bold', textContent: 'Passed', container });
+    }
+  }
+}

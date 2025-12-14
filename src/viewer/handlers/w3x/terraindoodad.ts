@@ -1,0 +1,33 @@
+import { vec3, quat } from 'gl-matrix';
+import { VEC3_UNIT_Z } from '../../../common/gl-matrix-addon.js';
+import { degToRad } from '../../../common/math.js';
+import { MappedDataRow } from '../../../utils/mappeddata.js';
+import DooTerrainDoodad from '../../../parsers/w3x/doo/terraindoodad.js';
+import MdxModel from '../mdx/model.js';
+import MdxModelInstance from '../mdx/modelinstance.js';
+import War3MapViewerMap from './map.js';
+
+
+const locationHeap = vec3.create();
+/**
+ * A cliff/terrain doodad.
+ */
+export default class TerrainDoodad {
+  instance: MdxModelInstance;
+  row: MappedDataRow;
+
+  constructor(map: War3MapViewerMap, model: MdxModel, row: MappedDataRow, doodad: DooTerrainDoodad) {
+    const centeroffset = map.centerOffset;
+    const instance = model.addInstance();
+
+    locationHeap[0] = doodad.location[0] * 128 + centeroffset[0] + 128;
+    locationHeap[1] = doodad.location[1] * 128 + centeroffset[1] + 128;
+
+    instance.move(locationHeap);
+    instance.rotateLocal(quat.setAxisAngle(quat.create(), VEC3_UNIT_Z, degToRad(row.number('fixedRot'))));
+    instance.setScene(map.worldScene);
+
+    this.instance = instance;
+    this.row = row;
+  }
+}
