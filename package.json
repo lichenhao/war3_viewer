@@ -35,14 +35,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/flowtsohg/mdx-m3-viewer.git"
+    "url": "https://github.com/lichenhao/war3_viewer.git"
   },
   "author": "Chananya Freiman",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/flowtsohg/mdx-m3-viewer/issues"
+    "url": "https://github.com/lichenhao/war3_viewer/issues"
   },
-  "homepage": "https://github.com/flowtsohg/mdx-m3-viewer#readme",
+  "homepage": "https://github.com/lichenhao/war3_viewer#readme",
   "dependencies": {
     "events": "^3.3.0",
     "fengari": "^0.1.4",
