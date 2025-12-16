@@ -14,7 +14,7 @@ URL: https://github.com/Huddle/Resemble.js
     } else {
         root.resemble = factory();
     }
-})(this, function() {
+})(this || window, function() {
     "use strict";
 
     var Img;

@@ -12,8 +12,8 @@ const twistHeap = new Float32Array(1);
 
 // Get the vector length between two touches.
 function getTouchesLength(touch1, touch2) {
-  let dx = touch2.clientX - touch1.clientX;
-  let dy = touch2.clientY - touch1.clientY;
+  const dx = touch2.clientX - touch1.clientX;
+  const dy = touch2.clientY - touch1.clientY;
 
   return Math.sqrt(dx * dx + dy * dy);
 }
@@ -60,7 +60,7 @@ export class SimpleOrbitCamera {
 
     this.update();
 
-    window.addEventListener('resize', (e) => this.onResize());
+    window.addEventListener('resize', () => this.onResize());
     setTimeout(() => this.onResize(), 0);
 
     // Disable the context menu when right-clicking.
@@ -90,8 +90,8 @@ export class SimpleOrbitCamera {
       this.mouse.x = e.clientX;
       this.mouse.y = e.clientY;
 
-      let dx = this.mouse.x - this.mouse.x2;
-      let dy = this.mouse.y - this.mouse.y2;
+      const dx = this.mouse.x - this.mouse.x2;
+      const dy = this.mouse.y - this.mouse.y2;
 
       if (this.mouse.buttons[0]) {
         this.rotate(dx, dy);
@@ -120,7 +120,7 @@ export class SimpleOrbitCamera {
     this.canvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
 
-      let targetTouches = e.targetTouches;
+      const targetTouches = e.targetTouches;
 
       if (targetTouches.length === 1) {
         this.touchMode = TOUCH_MODE_ROTATE;
@@ -150,18 +150,18 @@ export class SimpleOrbitCamera {
     this.canvas.addEventListener('touchmove', (e) => {
       e.preventDefault();
 
-      let targetTouches = e.targetTouches;
+      const targetTouches = e.targetTouches;
 
       if (this.touchMode === TOUCH_MODE_ROTATE) {
-        let oldTouch = this.touches[0];
-        let newTouch = targetTouches[0];
-        let dx = newTouch.clientX - oldTouch.clientX;
-        let dy = newTouch.clientY - oldTouch.clientY;
+        const oldTouch = this.touches[0];
+        const newTouch = targetTouches[0];
+        const dx = newTouch.clientX - oldTouch.clientX;
+        const dy = newTouch.clientY - oldTouch.clientY;
 
         this.rotate(dx, dy);
       } else if (this.touchMode === TOUCH_MODE_ZOOM) {
-        let len1 = getTouchesLength(this.touches[0], this.touches[1]);
-        let len2 = getTouchesLength(targetTouches[0], targetTouches[1]);
+        const len1 = getTouchesLength(this.touches[0], this.touches[1]);
+        const len2 = getTouchesLength(targetTouches[0], targetTouches[1]);
 
         this.zoom((len1 - len2) / 50);
       }
@@ -173,8 +173,8 @@ export class SimpleOrbitCamera {
 
   update() {
     if (this.instance) {
-      let instance = this.instance;
-      let mdxCamera = instance.model.cameras[0];
+      const instance = this.instance;
+      const mdxCamera = instance.model.cameras[0];
 
       mdxCamera.getTranslation(vecHeap, instance.sequence, instance.frame, instance.counter);
       vec3.add(vecHeap, vecHeap, mdxCamera.position);
@@ -198,14 +198,14 @@ export class SimpleOrbitCamera {
 
   // Move the camera and the target on the XY plane.
   move(x, y) {
-    let dirX = this.camera.directionX;
-    let dirY = this.camera.directionY;
-    let w = this.canvas.width;
-    let h = this.canvas.height;
-    let aspect = w / h;
+    const dirX = this.camera.directionX;
+    const dirY = this.camera.directionY;
+    const w = this.canvas.width;
+    const h = this.canvas.height;
+    const aspect = w / h;
 
-    let sw = (x / w) * this.distance * aspect;
-    let sh = (y / h) * this.distance;
+    const sw = (x / w) * this.distance * aspect;
+    const sh = (y / h) * this.distance;
 
     vec3.add(this.target, this.target, vec3.scale(vecHeap, vec3.normalize(vecHeap, vec3.set(vecHeap, dirX[0], dirX[1], 0)), sw));
     vec3.add(this.target, this.target, vec3.scale(vecHeap, vec3.normalize(vecHeap, vec3.set(vecHeap, dirY[0], dirY[1], 0)), sh));
@@ -242,8 +242,8 @@ export class SimpleOrbitCamera {
 
   // Resize the canvas automatically and update the camera.
   onResize() {
-    let width = Math.max(this.canvas.clientWidth, 1);
-    let height = Math.max(this.canvas.clientHeight, 1);
+    const width = Math.max(this.canvas.clientWidth, 1);
+    const height = Math.max(this.canvas.clientHeight, 1);
 
     this.canvas.width = width;
     this.canvas.height = height;
@@ -257,9 +257,9 @@ export class SimpleOrbitCamera {
   moveToAndFace(position, target) {
     vec3.sub(vecHeap, position, target);
 
-    let r = vec3.length(vecHeap);
-    let theta = Math.atan2(vecHeap[1], vecHeap[0]);
-    let phi = Math.acos(vecHeap[2] / r);
+    const r = vec3.length(vecHeap);
+    const theta = Math.atan2(vecHeap[1], vecHeap[0]);
+    const phi = Math.acos(vecHeap[2] / r);
 
     vec3.copy(this.target, target);
 
@@ -284,7 +284,7 @@ export class SimpleOrbitCamera {
     vec3.scale(this.position, this.position, this.distance);
     vec3.add(this.position, this.position, this.target);
 
-    let twist = this.twist - Math.PI / 2;
+    const twist = this.twist - Math.PI / 2;
     vec3.set(vecHeap, 0, -Math.cos(twist), -Math.sin(twist));
 
     this.camera.moveToAndFace(this.position, this.target, vecHeap);

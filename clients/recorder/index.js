@@ -1,13 +1,12 @@
-ModelViewer = ModelViewer.default;
+/* eslint-disable no-undef */
+import localOrHive from '../shared/localorhive.js';
+import {setupCamera} from '../shared/camera.js';
 
-let common = ModelViewer.common;
-let quat = common.glMatrix.quat;
-let vec3 = common.glMatrix.vec3;
-let math = common.math;
-let geometry = common.geometry;
+const common = ModelViewer.common;
+const quat = common.glMatrix.quat;
+const math = common.math;
 
-var keyboard = {};
-var mouse = { buttons: [false, false, false], x: 0, y: 0, x2: 0, y2: 0 };
+
 
 var canvas = document.getElementById('canvas');
 var viewer = new ModelViewer.viewer.ModelViewer(canvas, { alpha: true });
@@ -21,16 +20,16 @@ viewer.addHandler(ModelViewer.viewer.handlers.tga);
 viewer.addHandler(ModelViewer.viewer.handlers.dds);
 
 let backgroundOpaque = true;
-let turnTable = false;
+
 let turnTableSpeed = 0;
-let turnTableQuat = quat.create();
+const turnTableQuat = quat.create();
 let isRecording = false;
 let recordingFrame = 0;
 let oneTimeRecord = false;
 let zip = new JSZip();
 
-let frameCounterElement = document.getElementById('frame_counter');
-let sequenceNameElement = document.getElementById('sequence_name');
+const frameCounterElement = document.getElementById('frame_counter');
+const sequenceNameElement = document.getElementById('sequence_name');
 
 (function step() {
   viewer.updateAndRender();
@@ -54,22 +53,15 @@ let sequenceNameElement = document.getElementById('sequence_name');
   requestAnimationFrame(step);
 })();
 
-let scene = viewer.addScene();
+const scene = viewer.addScene();
 scene.alpha = true;
 setupCamera(scene, { distance: 500 });
 
 console.log('Viewer version', ModelViewer.version);
 
-// Run the next sequence for the given instance at e.
-function runNextSequence(e) {
-  let instance = e.target;
-
-  instance.setSequence((instance.sequence + 1) % instance.model.sequences.length);
-}
-
 // Log load starts to the console.
 viewer.on('loadstart', target => {
-  let path = target.fetchUrl;
+  const path = target.fetchUrl;
 
   if (path) {
     console.log('Loading ' + target.fetchUrl);
@@ -78,7 +70,7 @@ viewer.on('loadstart', target => {
 
 // Log load ends to the console.
 viewer.on('load', target => {
-  let path = target.fetchUrl;
+  const path = target.fetchUrl;
 
   if (path) {
     console.log('Finished loading ' + target.fetchUrl);
@@ -92,7 +84,7 @@ function normalizePath(path) {
 // Load a local file
 function onLocalFileLoaded(name, buffer) {
   if (name.endsWith('.mdx')) {
-    let pathSolver = src => {
+    const pathSolver = src => {
       if (src === buffer) {
         return src;
       } else {
@@ -129,13 +121,13 @@ canvas.addEventListener('selectstart', function (e) {
 });
 
 function onFileDrop(e) {
-  let file = e.dataTransfer.files[0];
+  const file = e.dataTransfer.files[0];
 
   if (file) {
-    let name = file.name.toLowerCase();
+    const name = file.name.toLowerCase();
 
     if (name.endsWith('.mdx') || name.endsWith('.blp')) {
-      let reader = new FileReader();
+      const reader = new FileReader();
 
       reader.addEventListener('loadend', e => onLocalFileLoaded(name, e.target.result));
       reader.readAsArrayBuffer(file);
@@ -158,10 +150,10 @@ document.addEventListener('drop', e => {
 });
 
 window.addEventListener('keydown', e => {
-  let key = e.key;
+  const key = e.key;
 
   if (instance) {
-    let model = instance.model;
+    const model = instance.model;
 
     if (key === ' ') {
       isRecording = !isRecording;

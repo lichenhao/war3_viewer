@@ -48,7 +48,7 @@ export const {
   lua_pushboolean,
   lua_pushnil,
   lua_toboolean,
-  to_luastring
+  lua_tostring,
 } = fengari.lua;
 
 // 从lauxlib中导出常用的函数
@@ -75,3 +75,4 @@ export const {
 export const {
   lua_newthread
 } = fengari.lua;
+export const to_luastring = fengari.to_luastring;

@@ -39,14 +39,14 @@ class TextureAtlasGenerator {
     document.addEventListener('drop', e => {
       e.preventDefault();
 
-      let file = e.dataTransfer.files[0];
-      let reader = new FileReader();
+      const file = e.dataTransfer.files[0];
+      const reader = new FileReader();
 
       reader.addEventListener('loadend', (e) => {
-        let image = new Image();
+        const image = new Image();
 
-        image.onload = (e) => this.setImage(image);
-        image.onerror = (e) => this.error('Failed to load the file');
+        image.onload = () => this.setImage(image);
+        image.onerror = () => this.error('Failed to load the file');
 
         image.src = e.target.result;
       });

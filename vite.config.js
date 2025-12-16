@@ -15,17 +15,6 @@ export default defineConfig(({ command, mode }) => {
           fileName: 'viewer'
         },
         rollupOptions: {
-          external: ['fengari', 'fengari-web', 'events', 'gl-matrix', 'pako', 'tga-js'],
-          output: {
-            globals: {
-              'fengari': 'fengari',
-              'fengari-web': 'fengariWeb',
-              'events': 'EventEmitter',
-              'gl-matrix': 'glMatrix',
-              'pako': 'pako',
-              'tga-js': 'TGA'
-            }
-          }
         },
         outDir: 'dist/umd'
       },
@@ -42,70 +31,8 @@ export default defineConfig(({ command, mode }) => {
           fileName: 'viewer'
         },
         rollupOptions: {
-          external: ['fengari', 'fengari-web', 'events', 'gl-matrix', 'pako', 'tga-js'],
-          output: {
-            globals: {
-              'fengari': 'fengari',
-              'fengari-web': 'fengariWeb',
-              'events': 'EventEmitter',
-              'gl-matrix': 'glMatrix',
-              'pako': 'pako',
-              'tga-js': 'TGA'
-            }
-          }
         },
         outDir: 'dist/mjs'
-      },
-      plugins: [react()]
-    };
-  } else if (mode.startsWith('client-')) {
-    // 客户端构建模式 - 为每个客户端生成独立的UMD打包文件
-    const clientName = mode.replace('client-', '');
-    
-    // 获取客户端入口配置
-    const clientConfigs = {
-      'example': resolve(__dirname, 'clients/example/index.js'),
-      'downgrader': resolve(__dirname, 'clients/downgrader/index.js'),
-      'map': resolve(__dirname, 'clients/map/index.js'),
-      'mdlx': resolve(__dirname, 'clients/mdlx/index.js'),
-      'rebuild': resolve(__dirname, 'clients/rebuild/index.js'),
-      'sanitytest': resolve(__dirname, 'clients/sanitytest/index.js'),
-      'tests': resolve(__dirname, 'clients/tests/index.js'),
-      'weu': resolve(__dirname, 'clients/weu/index.js'),
-      'mdlxoptimizer': resolve(__dirname, 'clients/mdlxoptimizer/index.ts')
-    };
-    
-    const entry = clientConfigs[clientName];
-    if (!entry) {
-      throw new Error(`Unknown client: ${clientName}`);
-    }
-    
-    return {
-      build: {
-        rollupOptions: {
-          input: {
-            [clientName]: entry
-          },
-          // 对于客户端构建，我们需要确保fengari-web被正确打包
-          // 但由于命名冲突问题，我们将fengari-web也排除在外，通过<script>标签引入
-          external: ['fengari', 'fengari-web', 'events', 'gl-matrix', 'pako', 'tga-js'],
-          output: {
-            format: 'umd',
-            entryFileNames: `clients/${clientName}.min.js`,
-            chunkFileNames: `clients/${clientName}.min.js`,
-            assetFileNames: `clients/${clientName}.[ext]`,
-            globals: {
-              'fengari': 'fengari',
-              'fengari-web': 'fengariWeb',
-              'events': 'EventEmitter',
-              'gl-matrix': 'glMatrix',
-              'pako': 'pako',
-              'tga-js': 'TGA'
-            }
-          }
-        },
-        outDir: '.',
-        emptyOutDir: false
       },
       plugins: [react()]
     };
@@ -150,7 +77,8 @@ export default defineConfig(({ command, mode }) => {
       ],
       resolve: {
         alias: {
-          events: resolve(__dirname, 'node_modules/events/events.js')
+          events: resolve(__dirname, 'node_modules/events/events.js'),
+          fengari: resolve(__dirname, 'node_modules/fengari-web/dist/fengari-web.js')
         }
       },
       define: {
