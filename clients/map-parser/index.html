@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Map Parser | HIVE</title>
+    <meta charset="utf-8" />
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        #header {
+            padding: 10px;
+            background-color: #333;
+            border-bottom: 1px solid #555;
+        }
+
+        #content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        #drop-zone {
+            width: 300px;
+            padding: 20px;
+            background-color: #222;
+            border-right: 1px solid #555;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #drop-zone.drag-over {
+            background-color: #333;
+            border: 2px dashed #00aa00;
+        }
+
+        #results {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #111;
+        }
+
+        .file-input {
+            margin: 20px 0;
+            padding: 10px 20px;
+            background-color: #444;
+            border: 1px solid #666;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .file-input:hover {
+            background-color: #555;
+        }
+
+        #status {
+            margin-top: 10px;
+            color: #ccc;
+        }
+
+        h1, h2 {
+            margin-top: 0;
+        }
+
+        h2 {
+            color: #4CAF50;
+        }
+        
+        /* JSON Tree View Styles */
+        .jsontree_tree {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            /* background-color: #fff; */
+            /* color: #d4d4d4; */
+            padding: 10px;
+            border-radius: 4px;
+            overflow: auto;
+            max-height: calc(100vh - 150px);
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="header">
+            <h1>War3 Map Parser</h1>
+            <p>Drag and drop a .w3x or .w3m file to parse its contents</p>
+        </div>
+        <div id="content">
+            <div id="drop-zone">
+                <h2>Upload Map File</h2>
+                <div class="file-input" onclick="document.getElementById('file-input').click()">
+                    Select File
+                </div>
+                <input type="file" id="file-input" accept=".w3x,.w3m" style="display: none;">
+                <p>or drag and drop a map file here</p>
+                <div id="status">Ready</div>
+            </div>
+            <div id="results">
+                <h2>Parsed Content</h2>
+                <div id="json-viewer"></div>
+                <pre id="output" style="display: none;">No data parsed yet. Upload a map file to begin.</pre>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="./index.js"></script>
+</body>
+</html>

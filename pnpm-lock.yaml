@@ -11,9 +11,6 @@ importers:
       events:
         specifier: ^3.3.0
         version: 3.3.0
-      fengari:
-        specifier: ^0.1.4
-        version: 0.1.4
       fengari-web:
         specifier: ^0.1.4
         version: 0.1.4
@@ -60,6 +57,9 @@ importers:
       eslint-plugin-react:
         specifier: ^7.37.5
         version: 7.37.5(eslint@9.39.2)
+      json-tree-view:
+        specifier: ^0.4.12
+        version: 0.4.12
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -1132,6 +1132,9 @@ packages:
 
   json-stable-stringify-without-jsonify@1.0.1:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
+
+  json-tree-view@0.4.12:
+    resolution: {integrity: sha512-p6si1qYiJQuJdL/KUCuAXmxWllIpZqyCCbcmIBD9k2M01JZVgzyYq9hVcTxeiy1rPgTiyZRVA86U92Ymw63dUQ==}
 
   json5@2.2.3:
     resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
@@ -2746,6 +2749,8 @@ snapshots:
   json-schema-traverse@0.4.1: {}
 
   json-stable-stringify-without-jsonify@1.0.1: {}
+
+  json-tree-view@0.4.12: {}
 
   json5@2.2.3: {}
 
