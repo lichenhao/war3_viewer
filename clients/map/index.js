@@ -3,15 +3,15 @@ import War3MapViewer from '../../src/viewer/handlers/w3x/viewer';
 import { setupCamera } from "../shared/camera";
 import localOrHive from "../shared/localorhive";
 
-let statusElement = document.getElementById('status');
+const statusElement = document.getElementById('status');
 statusElement.textContent = 'Initializing the viewer';
 
-let canvas = document.getElementById('canvas');
+const canvas = document.getElementById('canvas');
 
 // true because the Reforged Hive API is used in localOrHive.
-let viewer = new War3MapViewer(canvas, localOrHive, true);
+const viewer = new War3MapViewer(canvas, localOrHive, true);
 
-let thingsLoading = [];
+const thingsLoading = [];
 
 function updateStatus() {
   if (thingsLoading.length) {
@@ -21,7 +21,7 @@ function updateStatus() {
   }
 }
 
-for (let key of viewer.promiseMap.keys()) {
+for (const key of viewer.promiseMap.keys()) {
   thingsLoading.push(basename(key));
 }
 
@@ -33,8 +33,8 @@ viewer.on('loadstart', ({ fetchUrl }) => {
 });
 
 viewer.on('loadend', ({ fetchUrl }) => {
-  let file = basename(fetchUrl);
-  let index = thingsLoading.indexOf(file);
+  const file = basename(fetchUrl);
+  const index = thingsLoading.indexOf(file);
 
   if (index !== -1) {
     thingsLoading.splice(index, 1);
@@ -42,7 +42,7 @@ viewer.on('loadend', ({ fetchUrl }) => {
   }
 });
 
-let meter = new FPSMeter({
+const meter = new FPSMeter({
   position: 'absolute',
   right: '10px',
   top: '10px',
@@ -52,9 +52,9 @@ let meter = new FPSMeter({
   graph: 1
 });
 
-let cellsElement = document.getElementById('cells');
-let instancesElement = document.getElementById('instances');
-let particlesElement = document.getElementById('particles');
+const cellsElement = document.getElementById('cells');
+const instancesElement = document.getElementById('instances');
+const particlesElement = document.getElementById('particles');
 
 (function step() {
   requestAnimationFrame(step);
@@ -79,12 +79,12 @@ document.addEventListener('drop', e => {
   e.preventDefault();
 
   if (viewer.loadedBaseFiles) {
-    let file = e.dataTransfer.files[0];
-    let name = file.name;
-    let ext = extname(name);
+    const file = e.dataTransfer.files[0];
+    const name = file.name;
+    const ext = extname(name);
 
     if (ext === '.w3m' || ext === '.w3x') {
-      let reader = new FileReader();
+      const reader = new FileReader();
 
       reader.addEventListener('loadend', e => {
         viewer.loadMap(e.target.result);
