@@ -6,7 +6,6 @@ import Context from '../../../src/utils/jass2/context';
 import JassUnit from '../../../src/utils/jass2/types/unit';
 import Component from "../../shared/component";
 import { createElement } from "../../shared/domutils";
-import localOrHive from "../../shared/localorhive";
 import { aFrame } from "../../shared/utils";
 
 export default class Rebuilder extends Component {
@@ -26,12 +25,12 @@ export default class Rebuilder extends Component {
     this.text('Fetching files: "Scripts\\common.j", "Scripts\\Blizzard.j"');
     this.text('Please wait...');
 
-    let [commonjResponse, blizzardjResponse] = await Promise.all([
+    const [commonjResponse, blizzardjResponse] = await Promise.all([
       fetch('https://www.hiveworkshop.com/data/static_assets/mpq/tft/scripts/common.j'),
       fetch('https://www.hiveworkshop.com/data/static_assets/mpq/tft/scripts/blizzard.j'),
     ]);
 
-    let [commonjText, blizzardjText] = await Promise.all([
+    const [commonjText, blizzardjText] = await Promise.all([
       commonjResponse.text(),
       blizzardjResponse.text(),
     ]);
@@ -52,23 +51,23 @@ export default class Rebuilder extends Component {
 
   rebuildFile(file) {
     if (file) {
-      let name = file.name;
-      let ext = extname(name);
-      let isMap = ext === '.w3m' || ext === '.w3x';
+      const name = file.name;
+      const ext = extname(name);
+      const isMap = ext === '.w3m' || ext === '.w3x';
 
       this.clear();
 
       if (isMap) {
         this.text(`Reading ${name}`);
 
-        let reader = new FileReader();
+        const reader = new FileReader();
 
         reader.addEventListener('loadend', async (e) => {
-          let buffer = e.target.result;
+          const buffer = e.target.result;
 
           this.text(`Parsing ${name}`);
 
-          let map = new War3Map();
+          const map = new War3Map();
 
           try {
             map.load(buffer);
@@ -78,7 +77,7 @@ export default class Rebuilder extends Component {
             return;
           }
 
-          let context = new Context();
+          const context = new Context();
 
           this.text('Converting and running common.j');
           await aFrame();
@@ -103,12 +102,12 @@ export default class Rebuilder extends Component {
           this.text('Collecting handles');
           await aFrame();
 
-          let unitsFile = new UnitsDooFile();
-          let units = unitsFile.units;
+          const unitsFile = new UnitsDooFile();
+          const units = unitsFile.units;
 
-          for (let handle of context.handles) {
+          for (const handle of context.handles) {
             if (handle instanceof JassUnit) {
-              let unit = new UnitsDooUnit();
+              const unit = new UnitsDooUnit();
 
               unit.id = handle.unitId;
 
