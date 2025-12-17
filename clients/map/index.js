@@ -1,15 +1,22 @@
 import { basename, extname } from "../../src/common/path";
 import War3MapViewer from '../../src/viewer/handlers/w3x/viewer';
 import { setupCamera } from "../shared/camera";
-import localOrHive from "../shared/localorhive";
+
+// 创建一个通过代理加载资源的函数
+function proxyResourceLoader(src) {
+  // 构造代理URL
+  const proxyUrl = `/resources/${src}`;
+  console.log(`Loading resource through proxy: ${proxyUrl}`);
+  return proxyUrl;
+}
 
 const statusElement = document.getElementById('status');
 statusElement.textContent = 'Initializing the viewer';
 
 const canvas = document.getElementById('canvas');
 
-// true because the Reforged Hive API is used in localOrHive.
-const viewer = new War3MapViewer(canvas, localOrHive, true);
+// 使用代理资源加载器
+const viewer = new War3MapViewer(canvas, proxyResourceLoader, true);
 
 const thingsLoading = [];
 

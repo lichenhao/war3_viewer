@@ -7,6 +7,7 @@ import JassUnit from '../../../src/utils/jass2/types/unit';
 import Component from "../../shared/component";
 import { createElement } from "../../shared/domutils";
 import { aFrame } from "../../shared/utils";
+import localResourceLoader from "../../shared/localresource";
 
 export default class Rebuilder extends Component {
   constructor(parentElement) {
@@ -25,20 +26,21 @@ export default class Rebuilder extends Component {
     this.text('Fetching files: "Scripts\\common.j", "Scripts\\Blizzard.j"');
     this.text('Please wait...');
 
-    const [commonjResponse, blizzardjResponse] = await Promise.all([
-      fetch('https://www.hiveworkshop.com/data/static_assets/mpq/tft/scripts/common.j'),
-      fetch('https://www.hiveworkshop.com/data/static_assets/mpq/tft/scripts/blizzard.j'),
-    ]);
+    try {
+      // Load common.j with local caching through proxy
+      const commonjText = await localResourceLoader.load('scripts/common.j');
+      
+      // Load blizzard.j with local caching through proxy
+      const blizzardjText = await localResourceLoader.load('scripts/blizzard.j');
 
-    const [commonjText, blizzardjText] = await Promise.all([
-      commonjResponse.text(),
-      blizzardjResponse.text(),
-    ]);
+      this.commonjText = commonjText;
+      this.blizzardjText = blizzardjText;
 
-    this.commonjText = commonjText;
-    this.blizzardjText = blizzardjText;
-
-    this.text('Ready, drag and drop a map (*.w3m, *.w3x) anywhere on the page.');
+      this.text('Ready, drag and drop a map (*.w3m, *.w3x) anywhere on the page.');
+    } catch (error) {
+      console.error('Failed to load script files:', error);
+      this.text('Error loading script files. Please check the console for details.');
+    }
   }
 
   clear() {
