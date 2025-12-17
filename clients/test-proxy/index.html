@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Proxy Resource Loader Test</title>
+    <meta charset="utf-8" />
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            color: white;
+            font-family: Arial, sans-serif;
+            background-color: #1e1e1e;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #header {
+            padding: 10px;
+            background-color: #333;
+            border-bottom: 1px solid #555;
+            margin-bottom: 20px;
+        }
+
+        .test-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #2d2d2d;
+            border-radius: 5px;
+        }
+
+        .test-button {
+            padding: 10px 15px;
+            background-color: #444;
+            border: 1px solid #666;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .test-button:hover {
+            background-color: #555;
+        }
+
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #333;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        h1, h2 {
+            margin-top: 0;
+        }
+
+        h2 {
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="header">
+            <h1>Proxy Resource Loader Test</h1>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test Proxy Resource Loading</h2>
+            <button id="test-common-j" class="test-button">Load common.j</button>
+            <button id="test-blizzard-j" class="test-button">Load blizzard.j</button>
+            <button id="test-mdx-model" class="test-button">Load Test MDX Model</button>
+            <div id="test-result" class="test-result">Click a button to test loading...</div>
+        </div>
+    </div>
+
+    <script type="module" src="./index.js"></script>
+</body>
+</html>
