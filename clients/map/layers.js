@@ -1,13 +1,12 @@
 import { OBJECT_CLASSIFICATIONS, FACTIONS } from '../../src/war3/objectclassification.js';
-let GlobalCamera = null;
+let GlobalCanvas = null;
 /**
  * 初始化图层控制面板
  * @param {War3MapViewer} viewer - 地图查看器实例
  */
-export function setupLayers(viewer, cameraController) {
+export function setupLayers(viewer, c) {
     console.log('图层控制面板已初始化', viewer);
-    GlobalCamera = cameraController;
-    
+    GlobalCanvas = c;
     // 获取图层面板元素
     const layerPanel = document.getElementById('layerPanel');
     
@@ -19,6 +18,60 @@ export function setupLayers(viewer, cameraController) {
     
     // 加载物体数据
     loadMapObjects(viewer);
+    
+    // 初始化抽屉事件监听器
+    initDrawerEvents();
+}
+
+/**
+ * 初始化抽屉事件监听器
+ */
+function initDrawerEvents() {
+    // 属性面板抽屉关闭按钮
+    const propertyDrawerClose = document.getElementById('propertyDrawerClose');
+    const propertyDrawerOverlay = document.getElementById('propertyDrawerOverlay');
+    
+    if (propertyDrawerClose) {
+        propertyDrawerClose.addEventListener('click', closePropertyDrawer);
+    }
+    
+    if (propertyDrawerOverlay) {
+        propertyDrawerOverlay.addEventListener('click', closePropertyDrawer);
+    }
+    
+    // 事件面板抽屉关闭按钮已在events.js中处理
+}
+
+/**
+ * 打开属性面板抽屉
+ */
+function openPropertyDrawer() {
+    const drawer = document.getElementById('propertyDrawer');
+    const overlay = document.getElementById('propertyDrawerOverlay');
+    
+    if (drawer && overlay) {
+        overlay.style.display = 'block';
+        setTimeout(() => {
+            drawer.classList.add('open');
+        }, 10);
+    }
+}
+
+/**
+ * 关闭属性面板抽屉
+ */
+function closePropertyDrawer() {
+    const drawer = document.getElementById('propertyDrawer');
+    const overlay = document.getElementById('propertyDrawerOverlay');
+    
+    if (drawer) {
+        drawer.classList.remove('open');
+        setTimeout(() => {
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
+        }, 300);
+    }
 }
 
 /**
@@ -207,6 +260,11 @@ function loadMapObjects(viewer) {
     
     // 清空现有列表
     const objectList = document.getElementById('objectList');
+    if (!objectList) {
+        console.warn('无法找到物体列表容器');
+        return;
+    }
+    
     objectList.innerHTML = '';
     
     // 添加装饰物
@@ -275,7 +333,7 @@ function createObjectListItem(objectData) {
     // 确保position存在且为数组后再处理
     let positionText = '[0, 0, 0]';
     if (objectData.position && Array.isArray(objectData.position)) {
-        positionText = `[${objectData.position.map(p => typeof p === 'number' ? p.toFixed(1) : '0').join(', ')}]`;
+        positionText = `[${objectData.position.map(p => typeof p === 'number' ? p.toFixed(2) : '0').join(', ')}]`;
     }
     positionSpan.textContent = positionText;
     
@@ -300,13 +358,11 @@ function createObjectListItem(objectData) {
  * 聚焦到指定物体
  * @param {Object} objectData - 物体数据
  */
-function focusOnObject(objectData) {    
+function focusOnObject(objectData) {
     // 获取物体位置
     const [x, y, z] = objectData.position;
+    GlobalCanvas.moveTo(x,y,z);
     
-    // 移动相机到物体位置
-    // 使用现有的 moveTo 方法
-    GlobalCamera.moveTo(x, y, z);    
     console.log(`聚焦到物体: ${objectData.name || objectData.id} 位置: [${x}, ${y}, ${z}]`);
 }
 
@@ -315,20 +371,22 @@ function focusOnObject(objectData) {
  * @param {Object} objectData - 物体数据
  */
 function showObjectProperties(objectData) {
-    // 获取属性面板元素
-    const propertyPanel = document.getElementById('propertyPanel');
-    if (!propertyPanel) {
-        console.warn('无法找到属性面板');
+    // 获取属性抽屉内容容器
+    const propertyDrawerContent = document.getElementById('propertyDrawerContent');
+    if (!propertyDrawerContent) {
+        console.warn('无法找到属性抽屉内容容器');
+        // 如果找不到抽屉容器，则延迟一段时间后重试
+        setTimeout(() => showObjectProperties(objectData), 500);
         return;
     }
     
     // 清空现有内容
-    propertyPanel.innerHTML = '';
+    propertyDrawerContent.innerHTML = '';
     
     // 添加标题
     const title = document.createElement('h3');
     title.textContent = '对象属性';
-    propertyPanel.appendChild(title);
+    propertyDrawerContent.appendChild(title);
     
     // 创建属性容器
     const propertiesContainer = document.createElement('div');
@@ -412,11 +470,11 @@ function showObjectProperties(objectData) {
         }
     }
     
-    // 添加到属性面板
-    propertyPanel.appendChild(propertiesContainer);
+    // 添加到属性抽屉
+    propertyDrawerContent.appendChild(propertiesContainer);
     
-    // 激活属性面板标签页
-    activatePanelTab('propertyPanel');
+    // 打开属性抽屉
+    openPropertyDrawer();
 }
 
 /**
@@ -441,32 +499,4 @@ function addProperty(container, name, value) {
     propertyDiv.appendChild(valueLabel);
     
     container.appendChild(propertyDiv);
-}
-
-/**
- * 激活指定的面板标签页
- * @param {string} panelId - 面板ID
- */
-function activatePanelTab(panelId) {
-    // 获取所有标签页
-    const tabs = document.querySelectorAll('.plugin-tab');
-    const panels = document.querySelectorAll('.plugin-panel');
-    
-    // 更新标签页激活状态
-    tabs.forEach(tab => {
-        if (tab.getAttribute('data-target') === panelId) {
-            tab.classList.add('active');
-        } else {
-            tab.classList.remove('active');
-        }
-    });
-    
-    // 显示对应的面板
-    panels.forEach(panel => {
-        if (panel.id === panelId) {
-            panel.classList.add('active');
-        } else {
-            panel.classList.remove('active');
-        }
-    });
 }

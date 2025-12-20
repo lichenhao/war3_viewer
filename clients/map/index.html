@@ -32,9 +32,8 @@
             font-size: 12px;
         }
 
-        /* <!-- 缩略图面板样式;不要修改 --> */
         #thumbnailPanel {
-            position: fixed;
+            position: absolute;
             bottom: 20px;
             right: 20px;
             background: rgba(0, 0, 0, 0.7);
@@ -66,8 +65,6 @@
             font-size: 12px;
             text-overflow: ellipsis;
             white-space: nowrap;
-            word-wrap: break-word;
-            word-break: break-all;
             color: #ccc;
             width: 100%;
             overflow: hidden;
@@ -198,6 +195,145 @@
             color: #888;
             font-size: 11px;
         }
+
+        /* UI抽屉样式 */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 400px;
+            height: 100%;
+            background: rgba(30, 30, 30, 0.95);
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+            color: white;
+            overflow-y: auto;
+        }
+
+        .drawer.open {
+            transform: translateX(0);
+        }
+
+        .drawer-header {
+            padding: 15px;
+            border-bottom: 1px solid #444;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .drawer-title {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .drawer-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .drawer-content {
+            padding: 15px;
+        }
+
+        /* 属性面板抽屉样式 */
+        #propertyDrawer .properties-container {
+            margin-top: 10px;
+        }
+
+        #propertyDrawer .property-item {
+            margin-bottom: 8px;
+            padding: 5px;
+            background: rgba(50, 50, 50, 0.3);
+            border-radius: 3px;
+        }
+
+        #propertyDrawer .property-name {
+            font-weight: bold;
+            margin-right: 10px;
+            color: #4a90e2;
+        }
+
+        #propertyDrawer .property-value {
+            color: #ddd;
+        }
+
+        /* 事件面板抽屉样式 */
+        #eventDrawer .event-header {
+            margin-bottom: 15px;
+        }
+
+        #eventDrawer .event-toolbar {
+            margin-bottom: 10px;
+        }
+
+        #eventDrawer .toolbar-btn {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        #eventDrawer .toolbar-btn:hover {
+            background: #3a7bc8;
+        }
+
+        #eventDrawer .trigger-category h4 {
+            color: #4a90e2;
+            margin: 10px 0 5px 0;
+        }
+
+        #eventDrawer .event-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(50, 50, 50, 0.3);
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        #eventDrawer .event-item:hover {
+            background: rgba(74, 144, 226, 0.3);
+        }
+
+        #eventDrawer .event-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        #eventDrawer .event-details {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        #eventDrawer .event-description {
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        #eventDrawer .event-events, #eventDrawer .event-conditions, #eventDrawer .event-actions {
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
     </style>
 </head>
 <body>
@@ -222,7 +358,6 @@
         <div class="plugin-tabs">
             <div class="plugin-tab active" data-target="eventPanel">事件</div>
             <div class="plugin-tab" data-target="layerPanel">图层</div>
-            <div class="plugin-tab" data-target="propertyPanel">属性</div>
         </div>
         
         <!-- 图层面板 -->
@@ -231,21 +366,37 @@
             <!-- 图层内容将在JavaScript中动态生成 -->
         </div>
         
-        <!-- 属性面板 -->
-        <div id="propertyPanel" class="plugin-panel">
-            <h3>对象属性</h3>
-            <!-- 属性内容将在JavaScript中动态生成 -->
-        </div>
-        
         <!-- 事件编辑器面板 -->
         <div id="eventPanel" class="plugin-panel">
             <h3>触发器编辑器</h3>
             <!-- 事件编辑器内容将在JavaScript中动态生成 -->
         </div>
     </div>
-    
-    <!-- 不要修改下面的任何代码 -->
-    <script src="../thirdparty/fpsmeter.min.js"></script>
+
+    <!-- 属性面板抽屉 -->
+    <div class="drawer-overlay" id="propertyDrawerOverlay"></div>
+    <div class="drawer" id="propertyDrawer">
+        <div class="drawer-header">
+            <h3 class="drawer-title">对象属性</h3>
+            <button class="drawer-close" id="propertyDrawerClose">&times;</button>
+        </div>
+        <div class="drawer-content" id="propertyDrawerContent">
+            <!-- 属性内容将在这里动态生成 -->
+        </div>
+    </div>
+
+    <!-- 事件面板抽屉 -->
+    <div class="drawer-overlay" id="eventDrawerOverlay"></div>
+    <div class="drawer" id="eventDrawer">
+        <div class="drawer-header">
+            <h3 class="drawer-title">触发器编辑器</h3>
+            <button class="drawer-close" id="eventDrawerClose">&times;</button>
+        </div>
+        <div class="drawer-content" id="eventDrawerContent">
+            <!-- 事件内容将在这里动态生成 -->
+        </div>
+    </div>
+
     <script type="module" src="./index.js"></script>
 </body>
 </html>

@@ -16,6 +16,73 @@ export function setupTriggers(viewer) {
     if (viewer.map) {
         loadTriggerData();
     }
+    
+    // 确保初始加载触发器数据
+    loadTriggerData();
+    
+    // 初始化抽屉事件监听器
+    initEventDrawerEvents();
+}
+
+/**
+ * 初始化事件抽屉事件监听器
+ */
+function initEventDrawerEvents() {
+    // 获取事件面板标签页
+    const eventTab = document.querySelector('.plugin-tab[data-target="eventPanel"]');
+    
+    if (eventTab) {
+        eventTab.addEventListener('click', function() {
+            // 延迟一点时间确保面板已激活
+            setTimeout(() => {
+                openEventDrawer();
+            }, 100);
+        });
+    }
+    
+    // 添加抽屉关闭按钮事件监听器
+    const eventDrawerClose = document.getElementById('eventDrawerClose');
+    const eventDrawerOverlay = document.getElementById('eventDrawerOverlay');
+    
+    if (eventDrawerClose) {
+        eventDrawerClose.addEventListener('click', closeEventDrawer);
+    }
+    
+    if (eventDrawerOverlay) {
+        eventDrawerOverlay.addEventListener('click', closeEventDrawer);
+    }
+}
+
+/**
+ * 打开事件面板抽屉
+ */
+function openEventDrawer() {
+    const drawer = document.getElementById('eventDrawer');
+    const overlay = document.getElementById('eventDrawerOverlay');
+    
+    if (drawer && overlay) {
+        overlay.style.display = 'block';
+        setTimeout(() => {
+            drawer.classList.add('open');
+        }, 10);
+    }
+}
+
+/**
+ * 关闭事件面板抽屉
+ */
+function closeEventDrawer() {
+    const drawer = document.getElementById('eventDrawer');
+    const overlay = document.getElementById('eventDrawerOverlay');
+    
+    if (drawer) {
+        drawer.classList.remove('open');
+        setTimeout(() => {
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
+        }, 300);
+    }
 }
 
 /**
@@ -33,16 +100,24 @@ function attachEventListeners() {
     if (refreshTriggersBtn) {
         refreshTriggersBtn.addEventListener('click', loadTriggerData);
     }
+    
+    // 抽屉关闭按钮事件监听器已在initEventDrawerEvents中处理
 }
 
 /**
  * 加载触发器数据并显示在UI中
  */
 function loadTriggerData() {
-    if (!viewerRef || !viewerRef.map) return;
+    console.log('开始加载触发器数据...');
     
-    const eventList = document.getElementById('eventList');
-    if (!eventList) return;
+    // 获取事件抽屉内容容器
+    const eventDrawerContent = document.getElementById('eventDrawerContent');
+    if (!eventDrawerContent) {
+        console.error('无法找到事件抽屉内容容器 #eventDrawerContent');
+        // 如果找不到抽屉容器，则延迟一段时间后重试
+        setTimeout(loadTriggerData, 500);
+        return;
+    }
     
     try {
         // 尝试读取触发器文件
@@ -51,11 +126,11 @@ function loadTriggerData() {
         if (triggersData && triggersData.length > 0) {
             displayTriggers(triggersData);
         } else {
-            eventList.innerHTML = '<p>该地图没有触发器数据</p>';
+            eventDrawerContent.innerHTML = '<p>该地图没有触发器数据</p>';
         }
     } catch (error) {
         console.error('加载触发器数据失败:', error);
-        eventList.innerHTML = '<p>加载触发器数据失败: ' + error.message + '</p>';
+        eventDrawerContent.innerHTML = '<p>加载触发器数据失败: ' + error.message + '</p>';
     }
 }
 
@@ -192,10 +267,26 @@ function readTriggersFromMap() {
  * @param {Array} triggers - 触发器数组
  */
 function displayTriggers(triggers) {
-    const eventList = document.getElementById('eventList');
-    if (!eventList) return;
+    const eventDrawerContent = document.getElementById('eventDrawerContent');
+    if (!eventDrawerContent) {
+        console.error('无法找到事件抽屉内容容器 #eventDrawerContent');
+        // 如果找不到抽屉容器，则延迟一段时间后重试
+        setTimeout(() => displayTriggers(triggers), 500);
+        return;
+    }
     
-    eventList.innerHTML = '';
+    eventDrawerContent.innerHTML = '';
+    
+    // 添加标题和工具栏
+    const header = document.createElement('div');
+    header.className = 'event-header';
+    header.innerHTML = `
+        <div class="event-toolbar">
+            <button id="addTriggerBtn" class="toolbar-btn">添加触发器</button>
+            <button id="refreshTriggersBtn" class="toolbar-btn">刷新</button>
+        </div>
+    `;
+    eventDrawerContent.appendChild(header);
     
     // 按分类组织触发器
     const categorizedTriggers = {};
@@ -211,7 +302,7 @@ function displayTriggers(triggers) {
         const categoryHeader = document.createElement('div');
         categoryHeader.className = 'trigger-category';
         categoryHeader.innerHTML = `<h4>${category}</h4>`;
-        eventList.appendChild(categoryHeader);
+        eventDrawerContent.appendChild(categoryHeader);
         
         const triggerList = document.createElement('div');
         triggerList.className = 'trigger-list';
@@ -235,8 +326,11 @@ function displayTriggers(triggers) {
             triggerList.appendChild(triggerElement);
         });
         
-        eventList.appendChild(triggerList);
+        eventDrawerContent.appendChild(triggerList);
     }
+    
+    // 重新绑定事件监听器
+    attachEventListeners();
 }
 
 /**

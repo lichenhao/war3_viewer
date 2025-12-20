@@ -5,7 +5,7 @@ import localOrHive from "../shared/localorhive";
 import { setupThumbnail, updateViewportPosition } from "./thumbnail.js";
 import { setupLayers } from "./layers.js";
 import { setupTriggers } from "./events.js";
-// import FPSMeter from "../thirdparty/fpsmeter.min.js";
+import "../thirdparty/fpsmeter.min.js";
 
 const statusElement = document.getElementById('status');
 statusElement.textContent = 'Initializing the viewer';
@@ -128,7 +128,46 @@ document.addEventListener('DOMContentLoaded', function() {
       pluginContainer.style.display = 'none';
     }
   });
+  
+  // 初始化抽屉关闭按钮事件监听器
+  initDrawerCloseEvents();
 });
+
+/**
+ * 初始化抽屉关闭按钮事件监听器
+ */
+function initDrawerCloseEvents() {
+  // 属性面板抽屉关闭按钮
+  const propertyDrawerClose = document.getElementById('propertyDrawerClose');
+  const propertyDrawerOverlay = document.getElementById('propertyDrawerOverlay');
+  
+  if (propertyDrawerClose) {
+    propertyDrawerClose.addEventListener('click', closePropertyDrawer);
+  }
+  
+  if (propertyDrawerOverlay) {
+    propertyDrawerOverlay.addEventListener('click', closePropertyDrawer);
+  }
+  
+  // 事件面板抽屉关闭按钮已在events.js中处理
+}
+
+/**
+ * 关闭属性面板抽屉
+ */
+function closePropertyDrawer() {
+  const drawer = document.getElementById('propertyDrawer');
+  const overlay = document.getElementById('propertyDrawerOverlay');
+  
+  if (drawer) {
+    drawer.classList.remove('open');
+    setTimeout(() => {
+      if (overlay) {
+        overlay.style.display = 'none';
+      }
+    }, 300);
+  }
+}
 
 document.addEventListener('dragover', e => {
   e.preventDefault();
