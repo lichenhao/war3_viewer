@@ -135,8 +135,8 @@ export default class War3MapViewerMap {
 
     try {
       parser.load(mpqFile.bytes());
-    } catch (e) {
-      console.warn('Failed to correctly parse the map information file');
+    } catch (error) {
+      console.warn('Failed to correctly parse the map information file', error);
     }
 
     this.solverParams.tileset = parser.tileset.toLowerCase();
@@ -160,8 +160,8 @@ export default class War3MapViewerMap {
 
     try {
       parser.load(mpqFile.bytes());
-    } catch (e) {
-      console.warn(`Failed to load war3map.w3e: ${e}`);
+    } catch (error) {
+      console.warn(`Failed to load war3map.w3e: ${error}`);
       return;
     }
 
@@ -186,12 +186,17 @@ export default class War3MapViewerMap {
     for (const groundTileset of parser.groundTilesets) {
       const row = <MappedDataRow>viewer.terrainData.getRow(groundTileset);
 
-      this.tilesets.push(row);
-      
-      tilesetTextures.push(this.load(`${row.string('dir')}\\${row.string('file')}${texturesExt}`));
+      // Check if row exists before accessing its properties
+      if (row) {
+        this.tilesets.push(row);
+        
+        tilesetTextures.push(this.load(`${row.string('dir')}\\${row.string('file')}${texturesExt}`));
+      } else {
+        console.warn(`Could not find terrain data for ${groundTileset}`);
+      }
     }
 
-    const blights = {
+    const blights: { [key: string]: string } = {
       A: 'Ashen',
       B: 'Barrens',
       C: 'Felwood',
@@ -213,27 +218,71 @@ export default class War3MapViewerMap {
     };
 
     this.blightTextureIndex = this.tilesetTextures.length;
-    tilesetTextures.push(this.load(`TerrainArt\\Blight\\${blights[tileset]}_Blight${texturesExt}`));
-
+    // Check if tileset exists in blights mapping before accessing it
+    if (tileset in blights) {
+      tilesetTextures.push(this.load(`TerrainArt\\Blight\\${blights[tileset]}_Blight${texturesExt}`));
+    } else {
+      console.warn(`Could not find blight texture for tileset ${tileset}`);
+    }
+    
     for (const cliffTileset of parser.cliffTilesets) {
       const row = <MappedDataRow>viewer.cliffTypesData.getRow(cliffTileset);
 
-      this.cliffTilesets.push(row);
-      cliffTextures.push(this.load(`${row.string('texDir')}\\${row.string('texFile')}${texturesExt}`));
+      // Check if row exists before accessing its properties
+      if (row) {
+        this.cliffTilesets.push(row);
+        cliffTextures.push(this.load(`${row.string('texDir')}\\${row.string('texFile')}${texturesExt}`));
+      } else {
+        console.warn(`Could not find cliff tileset data for ${cliffTileset}`);
+        
+        // 更完善的默认处理方案：寻找最相似的悬崖类型作为替代
+        let fallbackRow = null;
+        let fallbackKey = '';
+        
+        // 首先尝试找前两个字符相同的
+        const prefix = cliffTileset.substring(0, 2);
+        const availableKeys = Object.keys(viewer.cliffTypesData.map);
+        for (const key of availableKeys) {
+          if (key.startsWith(prefix)) {
+            fallbackRow = <MappedDataRow>viewer.cliffTypesData.getRow(key);
+            fallbackKey = key;
+            break;
+          }
+        }
+        
+        // 如果没找到前缀相同的，则使用第一个可用的
+        if (!fallbackRow && availableKeys.length > 0) {
+          fallbackKey = availableKeys[0];
+          fallbackRow = <MappedDataRow>viewer.cliffTypesData.getRow(fallbackKey);
+        }
+        
+        if (fallbackRow) {
+          console.log(`Using fallback cliff type ${fallbackKey} for ${cliffTileset}`);
+          this.cliffTilesets.push(fallbackRow);
+          cliffTextures.push(this.load(`${fallbackRow.string('texDir')}\\${fallbackRow.string('texFile')}${texturesExt}`));
+        } else {
+          console.error('No fallback cliff type available!');
+        }
+      }
     }
 
     const waterRow = <MappedDataRow>viewer.waterData.getRow(`${tileset}Sha`);
 
-    this.waterHeightOffset = waterRow.number('height');
-    this.waterIncreasePerFrame = waterRow.number('texRate') / 60;
-    this.waterTextures.length = 0;
-    this.maxDeepColor.set([waterRow.number('Dmax_R'), waterRow.number('Dmax_G'), waterRow.number('Dmax_B'), waterRow.number('Dmax_A')]);
-    this.minDeepColor.set([waterRow.number('Dmin_R'), waterRow.number('Dmin_G'), waterRow.number('Dmin_B'), waterRow.number('Dmin_A')]);
-    this.maxShallowColor.set([waterRow.number('Smax_R'), waterRow.number('Smax_G'), waterRow.number('Smax_B'), waterRow.number('Smax_A')]);
-    this.minShallowColor.set([waterRow.number('Smin_R'), waterRow.number('Smin_G'), waterRow.number('Smin_B'), waterRow.number('Smin_A')]);
+    // Check if waterRow exists before accessing its properties
+    if (waterRow) {
+      this.waterHeightOffset = waterRow.number('height');
+      this.waterIncreasePerFrame = waterRow.number('texRate') / 60;
+      this.waterTextures.length = 0;
+      this.maxDeepColor.set([waterRow.number('Dmax_R'), waterRow.number('Dmax_G'), waterRow.number('Dmax_B'), waterRow.number('Dmax_A')]);
+      this.minDeepColor.set([waterRow.number('Dmin_R'), waterRow.number('Dmin_G'), waterRow.number('Dmin_B'), waterRow.number('Dmin_A')]);
+      this.maxShallowColor.set([waterRow.number('Smax_R'), waterRow.number('Smax_G'), waterRow.number('Smax_B'), waterRow.number('Smax_A')]);
+      this.minShallowColor.set([waterRow.number('Smin_R'), waterRow.number('Smin_G'), waterRow.number('Smin_B'), waterRow.number('Smin_A')]);
 
-    for (let i = 0, l = waterRow.number('numTex'); i < l; i++) {
-      waterTextures.push(this.load(`${waterRow.string('texFile')}${i < 10 ? '0' : ''}${i}${texturesExt}`));
+      for (let i = 0, l = waterRow.number('numTex'); i < l; i++) {
+        waterTextures.push(this.load(`${waterRow.string('texFile')}${i < 10 ? '0' : ''}${i}${texturesExt}`));
+      }
+    } else {
+      console.warn(`Could not find water data for tileset ${tileset}Sha`);
     }
 
     this.tilesetTextures = <Texture[]>await Promise.all(tilesetTextures);
@@ -419,8 +468,8 @@ export default class War3MapViewerMap {
 
     try {
       parser.load(mpqFile.bytes(), this.buildVersion);
-    } catch (e) {
-      console.warn(`Failed to load war3map.doo: ${e}`);
+    } catch (error) {
+      console.warn(`Failed to load war3map.doo: ${error}`);
       return;
     }
 
@@ -479,12 +528,17 @@ export default class War3MapViewerMap {
       try {
         const row = <MappedDataRow>this.viewer.doodadsData.getRow(doodad.id);
 
-        this.load(`${row.string('file')}.mdx`)
-          .then((model) => {
-            if (model) {
-              this.terrainDoodads.push(new TerrainDoodad(this, <MdxModel>model, row, doodad));
-            }
-          });
+        // Check if row exists before accessing its properties
+        if (row) {
+          this.load(`${row.string('file')}.mdx`)
+            .then((model) => {
+              if (model) {
+                this.terrainDoodads.push(new TerrainDoodad(this, <MdxModel>model, row, doodad));
+              }
+            });
+        } else {
+          console.warn(`Could not find doodad data for ID ${doodad.id}`);
+        }
 
         // let pathTexture = <Texture>this.load(row.pathTex);
 
@@ -500,8 +554,8 @@ export default class War3MapViewerMap {
         //     }
         //   }
         // });
-      } catch (e) {
-        console.warn(`Failed to load cliff/terrain doodad ID ${doodad.id}: ${e}`);
+      } catch (error) {
+        console.warn(`Failed to load cliff/terrain doodad ID ${doodad.id}: ${error}`);
       }
     }
 
@@ -521,8 +575,8 @@ export default class War3MapViewerMap {
 
     try {
       parser.load(mpqFile.bytes(), this.buildVersion);
-    } catch (e) {
-      console.warn(`Failed to load war3mapUnits.doo: ${e}`);
+    } catch (error) {
+      console.warn(`Failed to load war3mapUnits.doo: ${error}`);
       return;
     }
 
@@ -561,8 +615,8 @@ export default class War3MapViewerMap {
         } else {
           console.log('Unknown unit ID', unit.id, unit);
         }
-      } catch (e) {
-        console.warn(`Failed to load unit/item ID ${unit.id}: ${e}`);
+      } catch (error) {
+        console.warn(`Failed to load unit/item ID ${unit.id}: ${error}`);
       }
     }
 

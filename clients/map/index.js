@@ -2,6 +2,9 @@ import { basename, extname } from "../../src/common/path";
 import War3MapViewer from '../../src/viewer/handlers/w3x/viewer';
 import { setupCamera } from "../shared/camera";
 import localOrHive from "../shared/localorhive";
+import { setupThumbnail, updateViewportPosition } from "./thumbnail.js";
+import { setupLayers } from "./layers.js";
+import { setupTriggers } from "./events.js";
 
 const statusElement = document.getElementById('status');
 statusElement.textContent = 'Initializing the viewer';
@@ -42,6 +45,15 @@ viewer.on('loadend', ({ fetchUrl }) => {
   }
 });
 
+viewer.on('idle', function () {
+  if (!viewer.map) return;
+  // 初始化相机控制器
+  const c = setupCamera(viewer.map.worldScene, { distance: 3000 });
+  setupThumbnail(viewer, c);
+  setupLayers(viewer);
+  setupTriggers(viewer);
+});
+
 const meter = new FPSMeter({
   position: 'absolute',
   right: '10px',
@@ -52,19 +64,16 @@ const meter = new FPSMeter({
   graph: 1
 });
 
-const cellsElement = document.getElementById('cells');
-const instancesElement = document.getElementById('instances');
-const particlesElement = document.getElementById('particles');
-
 (function step() {
   requestAnimationFrame(step);
 
   viewer.updateAndRender();
   meter.tick();
-
-  cellsElement.textContent = `Cells: ${viewer.visibleCells}`;
-  instancesElement.textContent = `Instances: ${viewer.visibleInstances}`;
-  particlesElement.textContent = `Particles: ${viewer.updatedParticles}`;
+  
+  // 获取并显示当前渲染坐标（使用相机目标位置而非相机位置）
+  if (viewer.map && viewer.map.worldScene && viewer.map.worldScene.camera) {
+    updateViewportPosition(viewer);
+  }
 }());
 
 document.addEventListener('dragover', e => {
@@ -88,8 +97,6 @@ document.addEventListener('drop', e => {
 
       reader.addEventListener('loadend', e => {
         viewer.loadMap(e.target.result);
-
-        setupCamera(viewer.map.worldScene, { distance: 3000 });
       });
 
       reader.readAsArrayBuffer(file);

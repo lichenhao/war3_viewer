@@ -12,6 +12,7 @@
             height: 100%;
             margin: 0px;
             color: white;
+            font-family: Arial, sans-serif;
         }
 
         #canvas {
@@ -28,6 +29,7 @@
             top: 10px;
             user-select: none;
             pointer-events: none;
+            z-index: 10;
         }
 
         #status {
@@ -41,20 +43,227 @@
             justify-content: center;
             user-select: none;
             pointer-events: none;
+            z-index: 10;
+        }
+
+        /* 缩略图区域样式 */
+        #thumbnailContainer {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 10;
+            width: 170px; /* 包含padding */
+        }
+
+        #thumbnail {
+            background: #333;
+            border: 1px solid #666;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        #thumbnailCanvas {
+            width: 150px;
+            height: 150px;
+        }
+
+        #thumbnailViewport {
+            position: absolute;
+            border: 2px solid red;
+            background: rgba(255, 0, 0, 0.2);
+            pointer-events: none;
+        }
+
+        #coordinates {
+            margin-top: 10px;
+            font-size: 12px;
+            text-overflow: ellipsis;
+            white-space: nowrap;            
+            color: #ccc;
+            text-align: center;
+        }
+
+        /* 图层面板样式 */
+        #layerPanel {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 10;
+            width: 250px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        #layerPanel h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+
+        .layer-category {
+            margin-bottom: 15px;
+        }
+
+        .layer-category h4 {
+            margin: 0 0 5px 0;
+            font-size: 14px;
+            color: #4a90e2;
+            cursor: pointer;
+        }
+
+        .layer-category h4::before {
+            content: "▶ ";
+            transition: transform 0.2s;
+        }
+
+        .layer-category.expanded h4::before {
+            content: "▼ ";
+        }
+
+        .layer-items {
+            display: none;
+            margin-left: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .layer-category.expanded .layer-items {
+            display: block;
+        }
+
+        .layer-item {
+            padding: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            border-bottom: 1px solid #444;
+        }
+
+        .layer-item:hover {
+            background: rgba(74, 144, 226, 0.3);
+        }
+
+        .layer-item.selected {
+            background: rgba(74, 144, 226, 0.5);
+        }
+
+        /* 属性面板样式 */
+        #propertyPanel {
+            position: absolute;
+            right: 270px;
+            top: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 10;
+            width: 300px;
+            max-height: 80vh;
+            overflow-y: auto;
+            display: none;
+        }
+
+        #propertyPanel h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+
+        .property-item {
+            margin-bottom: 8px;
+        }
+
+        .property-item label {
+            display: block;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+
+        .property-item span {
+            display: block;
+            font-size: 13px;
+            padding: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        /* 事件编辑器样式 */
+        #eventEditor {
+            position: absolute;
+            left: 270px;
+            top: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 10;
+            width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            display: none;
+        }
+
+        #eventEditor h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+
+        #eventList {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .event-item {
+            padding: 8px;
+            margin-bottom: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .event-item:hover {
+            background: rgba(74, 144, 226, 0.3);
+        }
+
+        .event-item .event-name {
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .event-item .event-details {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        #toggleEventEditor {
+            position: absolute;
+            left: 270px;
+            top: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 5px 10px;
+            border-radius: 3px;
+            z-index: 10;
+            cursor: pointer;
+            font-size: 12px;
         }
     </style>
 </head>
 
 <body>
     <canvas id="canvas"></canvas>
+    <div id="status">Loading the page...</div>
+    <!-- 缩略图区域 -->
+    <div id="thumbnailContainer">
+        <div id="thumbnail">
+            <canvas id="thumbnailCanvas"></canvas>
+            <div id="thumbnailViewport"></div>
+        </div>
+        <div id="coordinates">当前坐标: (0, 0)</div>
+    </div>
 
-    <div id="status">Loading the page</div>
-
-    <div id="stats">
-        <div id="cells"></div>
-        <div id="instances"></div>
-        <div id="particles"></div>
-    </div> 
     <script src="../thirdparty/fpsmeter.min.js"></script>
     <script type="module" src="./index.js"></script>
 </body>

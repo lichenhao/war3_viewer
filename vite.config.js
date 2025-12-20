@@ -16,7 +16,9 @@ export default defineConfig(({ command, mode }) => {
         },
         rollupOptions: {
         },
-        outDir: 'dist/umd'
+        outDir: 'dist/umd',
+        // 为UMD构建启用sourcemap
+        sourcemap: true
       },
       plugins: [react()]
     };
@@ -32,7 +34,9 @@ export default defineConfig(({ command, mode }) => {
         },
         rollupOptions: {
         },
-        outDir: 'dist/mjs'
+        outDir: 'dist/mjs',
+        // 为MJS构建启用sourcemap
+        sourcemap: true
       },
       plugins: [react()]
     };
@@ -48,6 +52,10 @@ export default defineConfig(({ command, mode }) => {
           '.dds': 'application/octet-stream',
           '.tga': 'application/octet-stream'
         }
+      },
+      build: {
+        // 在开发模式下启用sourcemap以方便调试
+        sourcemap: true
       },
       plugins: [
         react(),

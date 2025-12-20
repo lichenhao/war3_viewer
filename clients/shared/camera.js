@@ -270,6 +270,37 @@ export class SimpleOrbitCamera {
     this.updateInternalCamera();
   }
 
+  /**
+   * 直接移动到指定的世界坐标位置
+   * @param {number} x - 世界坐标X
+   * @param {number} y - 世界坐标Y
+   * @param {number} z - 世界坐标Z (可选，默认为当前高度)
+   */
+  moveTo(x, y, z) {
+    // 如果没有提供z值，则保持当前的高度
+    if (z === undefined) {
+      z = this.target[2];
+    }
+    
+    // 设置新的目标位置
+    const newTarget = vec3.fromValues(x, y, z);
+    
+    // 保持当前的距离和角度，只改变目标位置
+    vec3.copy(this.target, newTarget);
+    
+    // 更新相机位置以匹配新的目标位置
+    this.updateInternalCamera();
+    
+    // 如果当前有绑定实例，则解除绑定
+    if (this.instance) {
+      this.instance = null;
+      
+      if (this.onManualChange) {
+        this.onManualChange();
+      }
+    }
+  }
+
   updateInternalCamera() {
     // Limit the vertical angle so it doesn't flip.
     // Since the camera uses a quaternion, flips don't matter to it, but this feels better.
