@@ -53,8 +53,8 @@ viewer.on('idle', function () {
   // 地图加载完毕了，初始化相机控制器
   const c = setupCamera(viewer.map.worldScene, { distance: 3000 });
   setupThumbnail(viewer, c);
-  setupLayers(viewer);
-  setupTriggers(viewer);
+  setupLayers(viewer, c);
+  setupTriggers(viewer, c);
   
   // 显示插件容器
   document.getElementById('togglePluginContainer').style.display = 'block';

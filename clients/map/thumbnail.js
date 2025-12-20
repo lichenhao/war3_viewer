@@ -13,6 +13,8 @@ let GlobalCamera = null;
 export function setupThumbnail(viewer, cameraController) {
     cvs.width = WIDTH;
     cvs.height = HEIGHT;
+    cvs.style.width = WIDTH + 'px';
+    cvs.style.height = HEIGHT + 'px';
     GlobalCamera = cameraController;
     document.getElementById('thumbnailPanel').style.display = 'block';
     console.log(viewer, cameraController);
