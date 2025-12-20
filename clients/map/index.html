@@ -46,29 +46,79 @@
             z-index: 10;
         }
 
-        /* 缩略图区域样式 */
-        #thumbnailContainer {
+        /* 插件容器样式 */
+        #pluginContainer {
             position: absolute;
             right: 10px;
-            bottom: 10px;
+            top: 10px;
             background: rgba(0, 0, 0, 0.7);
-            padding: 10px;
             border-radius: 5px;
             z-index: 10;
-            width: 170px; /* 包含padding */
+            width: 300px;
+            max-height: 80vh;
+            overflow: hidden;
+            display: none;
         }
 
+        /* Tab导航样式 */
+        .plugin-tabs {
+            display: flex;
+            background: rgba(30, 30, 30, 0.9);
+            border-bottom: 1px solid #444;
+        }
+
+        .plugin-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 14px;
+            border-right: 1px solid #444;
+            background: rgba(50, 50, 50, 0.5);
+        }
+
+        .plugin-tab:last-child {
+            border-right: none;
+        }
+
+        .plugin-tab.active {
+            background: rgba(74, 144, 226, 0.7);
+        }
+
+        .plugin-tab:hover:not(.active) {
+            background: rgba(74, 144, 226, 0.3);
+        }
+
+        /* Tab内容面板样式 */
+        .plugin-panel {
+            display: none;
+            padding: 10px;
+            max-height: calc(80vh - 50px);
+            overflow-y: auto;
+        }
+
+        .plugin-panel.active {
+            display: block;
+        }
+        #thumbnailPanel {
+            display: none;
+            position: fixed;
+            right: 10px;
+            bottom: 10px;            
+        }
         #thumbnail {
             background: #333;
             border: 1px solid #666;
             position: relative;
             overflow: hidden;
             cursor: pointer;
+            width: 150px;
+            height: 150px;
         }
 
         #thumbnailCanvas {
-            width: 150px;
-            height: 150px;
+            width: 100%;
+            height: 100%;
         }
 
         #thumbnailViewport {
@@ -82,25 +132,16 @@
             margin-top: 10px;
             font-size: 12px;
             text-overflow: ellipsis;
-            white-space: nowrap;            
+            white-space: nowrap;
+            word-wrap: none;
+            word-break: keep-all;
             color: #ccc;
+            width: 100%;
+            overflow: hidden;
             text-align: center;
         }
 
         /* 图层面板样式 */
-        #layerPanel {
-            position: absolute;
-            left: 10px;
-            top: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px;
-            border-radius: 5px;
-            z-index: 10;
-            width: 250px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
         #layerPanel h3 {
             margin: 0 0 10px 0;
             font-size: 16px;
@@ -152,21 +193,63 @@
             background: rgba(74, 144, 226, 0.5);
         }
 
-        /* 属性面板样式 */
-        #propertyPanel {
-            position: absolute;
-            right: 270px;
-            top: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px;
-            border-radius: 5px;
-            z-index: 10;
-            width: 300px;
-            max-height: 80vh;
-            overflow-y: auto;
-            display: none;
+        .object-category {
+            margin-bottom: 10px;
         }
 
+        .object-category h5 {
+            margin: 0 0 5px 0;
+            font-size: 13px;
+            color: #4a90e2;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .object-items {
+            margin-left: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .object-item {
+            padding: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            border-bottom: 1px solid #444;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .object-item:hover {
+            background: rgba(74, 144, 226, 0.3);
+        }
+
+        .object-id {
+            font-weight: bold;
+            color: #fff;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .object-faction {
+            color: #4a90e2;
+            font-size: 11px;
+            flex: 1;
+            text-align: center;
+        }
+
+        .object-position {
+            color: #aaa;
+            font-size: 11px;
+            flex: 1;
+            text-align: right;
+        }
+
+        /* 属性面板样式 */
         #propertyPanel h3 {
             margin: 0 0 10px 0;
             font-size: 16px;
@@ -192,28 +275,32 @@
         }
 
         /* 事件编辑器样式 */
-        #eventEditor {
-            position: absolute;
-            left: 270px;
-            top: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px;
-            border-radius: 5px;
-            z-index: 10;
-            width: 400px;
-            max-height: 80vh;
-            overflow-y: auto;
-            display: none;
-        }
-
-        #eventEditor h3 {
+        #eventPanel h3 {
             margin: 0 0 10px 0;
             font-size: 16px;
+            color: #4a90e2;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
         }
 
         #eventList {
             max-height: 300px;
             overflow-y: auto;
+        }
+
+        .trigger-category {
+            margin-bottom: 10px;
+        }
+
+        .trigger-category h4 {
+            margin: 0 0 5px 0;
+            font-size: 14px;
+            color: #4a90e2;
+            cursor: pointer;
+        }
+
+        .trigger-list {
+            margin-left: 10px;
         }
 
         .event-item {
@@ -222,6 +309,7 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 3px;
             cursor: pointer;
+            transition: background 0.2s;
         }
 
         .event-item:hover {
@@ -231,16 +319,62 @@
         .event-item .event-name {
             font-weight: bold;
             font-size: 13px;
+            color: #fff;
         }
 
         .event-item .event-details {
             font-size: 12px;
             color: #aaa;
+            margin: 3px 0;
         }
 
-        #toggleEventEditor {
+        .event-item .event-description {
+            font-size: 11px;
+            color: #888;
+            margin-top: 3px;
+        }
+
+        .event-item .event-events,
+        .event-item .event-conditions,
+        .event-item .event-actions {
+            font-size: 11px;
+            color: #aaa;
+            margin-top: 2px;
+            padding-left: 10px;
+        }
+
+        .event-item .event-events strong,
+        .event-item .event-conditions strong,
+        .event-item .event-actions strong {
+            color: #4a90e2;
+        }
+
+        /* 触发器工具栏样式 */
+        #triggerToolbar {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #444;
+        }
+
+        #triggerToolbar button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        #triggerToolbar button:hover {
+            background: #3a7bc8;
+        }
+
+        /* 插件切换按钮 */
+        #togglePluginContainer {
             position: absolute;
-            left: 270px;
+            right: 10px;
             top: 10px;
             background: rgba(0, 0, 0, 0.7);
             padding: 5px 10px;
@@ -248,6 +382,13 @@
             z-index: 10;
             cursor: pointer;
             font-size: 12px;
+            color: #4a90e2;
+            border: 1px solid #4a90e2;
+            display: block;
+        }
+
+        #togglePluginContainer:hover {
+            background: rgba(74, 144, 226, 0.3);
         }
     </style>
 </head>
@@ -255,15 +396,52 @@
 <body>
     <canvas id="canvas"></canvas>
     <div id="status">Loading the page...</div>
-    <!-- 缩略图区域 -->
-    <div id="thumbnailContainer">
+    <!-- 缩略图面板 -->
+    <div id="thumbnailPanel">
+        <div id="coordinates">
+            坐标:(0,0)
+        </div>
         <div id="thumbnail">
             <canvas id="thumbnailCanvas"></canvas>
             <div id="thumbnailViewport"></div>
         </div>
-        <div id="coordinates">当前坐标: (0, 0)</div>
     </div>
-
+    <!-- 插件切换按钮 -->
+    <div id="togglePluginContainer">插件面板</div>
+    
+    <!-- 插件容器 -->
+    <div id="pluginContainer">
+        <!-- Tab导航 -->
+        <div class="plugin-tabs">
+            <div class="plugin-tab active" data-target="eventPanel">事件</div>
+            <div class="plugin-tab" data-target="layerPanel">图层</div>
+            <div class="plugin-tab" data-target="propertyPanel">属性</div>
+        </div>
+        
+        <!-- 图层面板 -->
+        <div id="layerPanel" class="plugin-panel">
+            <h3>图层控制</h3>
+            <!-- 图层内容将在JavaScript中动态生成 -->
+        </div>
+        
+        <!-- 属性面板 -->
+        <div id="propertyPanel" class="plugin-panel">
+            <h3>对象属性</h3>
+            <!-- 属性内容将在JavaScript中动态生成 -->
+        </div>
+        
+        <!-- 事件编辑器面板 -->
+        <div id="eventPanel" class="plugin-panel">
+            <h3>触发器编辑器</h3>
+            <div id="triggerToolbar">
+                <button id="addTriggerBtn">添加触发器</button>
+                <button id="refreshTriggersBtn">刷新</button>
+            </div>
+            <div id="eventList"></div>
+        </div>
+    </div>
+    
+    <div id="fpsMeter"></div>
     <script src="../thirdparty/fpsmeter.min.js"></script>
     <script type="module" src="./index.js"></script>
 </body>

@@ -14,6 +14,7 @@ export function setupThumbnail(viewer, cameraController) {
     cvs.width = WIDTH;
     cvs.height = HEIGHT;
     GlobalCamera = cameraController;
+    document.getElementById('thumbnailPanel').style.display = 'block';
     console.log(viewer, cameraController);
     // 创建缩略图
     createThumbnail(viewer);
@@ -152,10 +153,12 @@ function createThumbnail(viewer) {
         const posY = HEIGHT/2 - (rotatedY / mapWorldHeight) * HEIGHT;
         const size = GRID_SIZE * (WIDTH / mapWorldWidth);
         ctx.strokeRect(posX, posY, size, size);
-
       }
     }
   }
+  
+  // 绘制建筑物、单位、装饰物等对象
+  drawMapObjects(ctx, viewer, mapMinX, mapMinY, mapWorldWidth, mapWorldHeight);
   
   // 标记地图中心点(0,0)位置
   const centerX = WIDTH / 2;
@@ -168,6 +171,144 @@ function createThumbnail(viewer) {
   // 保存 viewer 引用以便后续使用
   window.viewer = viewer;
   updateViewportPosition(viewer);
+}
+
+/**
+ * 绘制地图对象（建筑物、单位、装饰物等）
+ * @param {CanvasRenderingContext2D} ctx - Canvas绘图上下文
+ * @param {War3MapViewer} viewer - 地图查看器
+ * @param {number} mapMinX - 地图最小X坐标
+ * @param {number} mapMinY - 地图最小Y坐标
+ * @param {number} mapWorldWidth - 地图世界宽度
+ * @param {number} mapWorldHeight - 地图世界高度
+ */
+function drawMapObjects(ctx, viewer, mapMinX, mapMinY, mapWorldWidth, mapWorldHeight) {
+  try {
+    // 绘制单位（红色标点）
+    if (viewer.map.units && viewer.map.units.length > 0) {
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.8)'; // 红色表示单位/怪物
+      viewer.map.units.forEach(unit => {
+        if (unit && unit.instance) {
+          // 安全地获取位置信息
+          let location = [0, 0, 0];
+          if (unit.instance.position) {
+            location = unit.instance.position;
+          }
+          
+          // 确保坐标存在且有效
+          if (location && location.length >= 2) {
+            drawObjectPoint(ctx, location[0], location[1], mapMinX, mapMinY, mapWorldWidth, mapWorldHeight, 3);
+          }
+        }
+      });
+    }
+    
+    // 绘制装饰物（绿色标点）
+    if (viewer.map.doodads && viewer.map.doodads.length > 0) {
+      viewer.map.doodads.forEach(doodad => {
+        if (doodad && doodad.instance) {
+          // 安全地获取位置信息
+          let location = [0, 0, 0];
+          if (doodad.instance.position) {
+            location = doodad.instance.position;
+          }
+          
+          // 确保坐标存在且有效
+          if (location && location.length >= 2) {
+            // 获取对象ID用于类型判断
+            let id = '';
+            if (doodad.row && doodad.row.id) {
+              id = doodad.row.id;
+            } else if (doodad.row && typeof doodad.row === 'object') {
+              // 尝试其他可能的ID属性
+              id = doodad.row['id'] || '';
+            }
+            
+            // 根据ID判断类型并设置颜色
+            if (isVegetation(id)) {
+              ctx.fillStyle = 'rgba(0, 255, 0, 0.6)'; // 绿色表示植物
+            } else if (isMountain(id)) {
+              ctx.fillStyle = 'rgba(139, 69, 19, 0.7)'; // 棕色表示山地
+            } else {
+              ctx.fillStyle = 'rgba(0, 0, 255, 0.5)'; // 蓝色表示建筑/其他装饰物
+            }
+            
+            drawObjectPoint(ctx, location[0], location[1], mapMinX, mapMinY, mapWorldWidth, mapWorldHeight, 2);
+          }
+        }
+      });
+    }
+    
+    // 绘制地形装饰物（黄色标点）
+    if (viewer.map.terrainDoodads && viewer.map.terrainDoodads.length > 0) {
+      ctx.fillStyle = 'rgba(255, 255, 0, 0.6)'; // 黄色表示地形装饰物
+      viewer.map.terrainDoodads.forEach(terrainDoodad => {
+        if (terrainDoodad && terrainDoodad.instance) {
+          // 安全地获取位置信息
+          let location = [0, 0, 0];
+          if (terrainDoodad.instance.position) {
+            location = terrainDoodad.instance.position;
+          }
+          
+          // 确保坐标存在且有效
+          if (location && location.length >= 2) {
+            drawObjectPoint(ctx, location[0], location[1], mapMinX, mapMinY, mapWorldWidth, mapWorldHeight, 2);
+          }
+        }
+      });
+    }
+  } catch (error) {
+    console.warn('绘制地图对象时出错:', error);
+  }
+}
+
+/**
+ * 绘制对象点
+ * @param {CanvasRenderingContext2D} ctx - Canvas绘图上下文
+ * @param {number} worldX - 世界X坐标
+ * @param {number} worldY - 世界Y坐标
+ * @param {number} mapMinX - 地图最小X坐标
+ * @param {number} mapMinY - 地图最小Y坐标
+ * @param {number} mapWorldWidth - 地图世界宽度
+ * @param {number} mapWorldHeight - 地图世界高度
+ * @param {number} size - 点的大小
+ */
+function drawObjectPoint(ctx, worldX, worldY, mapMinX, mapMinY, mapWorldWidth, mapWorldHeight, size) {
+  try {
+    // 旋转-90度: newX = y, newY = -x
+    const rotatedX = worldY;
+    const rotatedY = -worldX;
+    const posX = WIDTH/2 + (rotatedX / mapWorldWidth) * WIDTH;
+    const posY = HEIGHT/2 - (rotatedY / mapWorldHeight) * HEIGHT;
+    
+    ctx.beginPath();
+    ctx.arc(posX, posY, size, 0, Math.PI * 2);
+    ctx.fill();
+  } catch (error) {
+    console.warn('绘制对象点时出错:', error);
+  }
+}
+
+/**
+ * 判断是否为植被类型
+ * @param {string} id - 对象ID
+ * @returns {boolean} 是否为植被
+ */
+function isVegetation(id) {
+  if (!id || typeof id !== 'string') return false;
+  const vegetationKeywords = ['Tree', 'Bush', 'Plant', 'Grass', 'Flower', 'Shrub', 'Vegetation', 'Forest'];
+  return vegetationKeywords.some(keyword => id.includes(keyword));
+}
+
+/**
+ * 判断是否为山地类型
+ * @param {string} id - 对象ID
+ * @returns {boolean} 是否为山地
+ */
+function isMountain(id) {
+  if (!id || typeof id !== 'string') return false;
+  const mountainKeywords = ['Mountain', 'Rock', 'Stone', 'Cliff', 'Hill', 'Peak'];
+  return mountainKeywords.some(keyword => id.includes(keyword));
 }
 
 // 更新缩略图视口位置
@@ -208,7 +349,8 @@ export function updateViewportPosition(viewer) {
     viewport.style.display = 'block';
     // 如果页面上有坐标显示元素，可以更新其内容
     const coordsElement = document.getElementById('coordinates');
-    coordsElement.textContent = `坐标: (${targetX.toFixed(2)}, ${targetY.toFixed(2)}, ${GlobalCamera.target[2].toFixed(2)})`;
+    // coordsElement.innerHTML = `<div>坐标：</div><div>X: </div><div></div>`;
+    coordsElement.textContent = `坐标: (${targetX.toFixed(2)}, ${targetY.toFixed(2)})`;
 }
 
 /**
