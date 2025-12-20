@@ -63,9 +63,9 @@ viewer.on('idle', function () {
 
 const meter = new FPSMeter({
   position: 'absolute',
-  right: '10px',
+  left: '10px',
   top: '10px',
-  left: 'calc(100% - 130px)',
+  // left: 'calc(100% - 130px)',
   theme: 'transparent',
   heat: 1,
   graph: 1
